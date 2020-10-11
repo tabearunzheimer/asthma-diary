@@ -1,0 +1,25 @@
+import 'package:asthma_tagebuch/helper/Reusable_Widgets.dart';
+import 'package:flutter/material.dart';
+
+class SettingsScreen extends StatefulWidget {
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+
+  int _selectedIndex = 3;
+  ReusableWidgets _reusableWidgets;
+
+  @override
+  Widget build(BuildContext context) {
+    _reusableWidgets = new ReusableWidgets(context, _selectedIndex);
+
+    return Scaffold(
+      appBar: _reusableWidgets.getNormalAppBar(),
+      bottomNavigationBar: _reusableWidgets.getBottomNavigationBar(),
+    );
+  }
+
+
+}

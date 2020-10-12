@@ -87,11 +87,16 @@ class Diary{
           }
         }
         if (number != "" && spray != "" && dose != "" && done != "") {
-          //print("number: " + number + " spray: " + spray + " dosis: " + dose + " done: " + done);
+          print("number: " + number + " spray: " + spray + " dosis: " + dose + " done: " + done);
           Inhalation i = new Inhalation(spray, int.parse(number));
           i.setDose(int.parse(dose));
           bool d = int.parse(done) == 0 ? false : true;
           i.setDone(d);
+          erg.add(i);
+        } else if (number != "" && spray != "" && dose != ""){
+          print("number: " + number + " spray: " + spray + " dosis: " + dose);
+          Inhalation i = new Inhalation(spray, int.parse(number));
+          i.setDose(int.parse(dose));
           erg.add(i);
         }
     }
@@ -115,6 +120,14 @@ class Diary{
     String erg = "";
     for (int i = 0; i < list.length; i++){
       erg += "${list[i].getAmount()},${list[i].getSpray()},${list[i].getDose()},${list[i].getDoneAsNumber()};";
+    }
+    return erg;
+  }
+
+  String createSpraysStringWithoutDone(List<Inhalation> list){
+    String erg = "";
+    for (int i = 0; i < list.length; i++){
+      erg += "${list[i].getAmount()},${list[i].getSpray()},${list[i].getDose()};";
     }
     return erg;
   }

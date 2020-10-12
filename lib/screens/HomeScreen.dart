@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> _surroundings = [
     "Allergische Reaktion",
     "Angst/ Panik",
+    "Bedarfsmedikation genommen",
     "Bettzeug waschen",
     "Krank",
     "Putzen",

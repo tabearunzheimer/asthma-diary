@@ -66,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _night = new List<Inhalation>();
     _inhalationDone = new List<bool>();
     _symptomsAndSurroundingsChecked = new List<bool>();
+
     for (int i = 0; i < _symptoms.length + _surroundings.length; i++ ){
       _symptomsAndSurroundingsChecked.add(false);
     }
@@ -412,6 +413,10 @@ class _HomeScreenState extends State<HomeScreen> {
         loadString(userNoonSprays);
         loadString(userEveningSprays);
         loadString(userNightSprays);
+
+        for (int i = 0; i < _morning.length + _noon.length + _evening.length + _night.length; i++){
+          _inhalationDone.add(false);
+        }
       });
 
     }
@@ -453,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       showSaveButton();
       //print("value: " + value.toString() + " index: " + index.toString() + " list: " + _symptomsAndSurroundingsChecked[index].toString());
-      _symptomsAndSurroundingsChecked[index] = value;
+      list[index] = value;
     });
   }
 
@@ -516,6 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
       switch (key) {
         case 'userMorningSprays':
           String s = prefs.get(key) ?? "No Data";
+          print("Morning: " + s);
           _morning = _d.separateSpraysString(s);
           break;
         case 'userNoonSprays':

@@ -406,21 +406,14 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } catch (ex) {
       print("Datenbank-Fehler: " + ex.toString());
-      int id = int.parse(_visibleDay.day.toString() + _visibleDay.month.toString() + _visibleDay.year.toString());
-      int r;
-      for (int i = 0; i < ratingButtons.length; i++){
-        if (ratingButtons[i]){
-          r = i;
-        }
-      }
-      String m = _d.createSpraysString(_morning);
-      String no = _d.createSpraysString(_noon);
-      String e = _d.createSpraysString(_evening);
-      String ni = _d.createSpraysString(_night);
-      String symp = getSymptomsAndSurroundingsString(0, _symptoms);
-      String sur = getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
 
-      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day, _visibleDay.month, _visibleDay.year, "");
+      setState(() {
+        loadString(userMorningSprays);
+        loadString(userNoonSprays);
+        loadString(userEveningSprays);
+        loadString(userNightSprays);
+      });
+
     }
   }
 
@@ -511,6 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
         dbHelper.update(map);
       } catch (ex){
         print("Fehler beim speichern: " + ex);
+        dbHelper.insert(map);
       }
 
     });

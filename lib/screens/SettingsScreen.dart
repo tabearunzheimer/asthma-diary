@@ -32,6 +32,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   TextEditingController _sprayAmount = new TextEditingController();
   TextEditingController _sprayDose = new TextEditingController();
 
+  List<bool> _memories;
+  List<String> _allergies = ["Birkenpollen", "Buchenpollen", "Eschenpollen"];
+  List<String> _others = ["Bettwäsche waschen", "Staub wischen"];
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +45,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _night = new List();
     _demand = new List();
 
+    _memories = new List();
+
+    for (int i = 0; i < _allergies.length + _others.length; i++) {
+      _memories.add(false);
+    }
+
     SharedPreferences.getInstance().then((sp) {
       this.prefs = sp;
       loadString(userMorningSprays);
@@ -48,6 +58,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       loadString(userEveningSprays);
       loadString(userNightSprays);
       loadString(userDemandSprays);
+      for (int i  = 0; i < _allergies.length; i++){
+        loadBool(_allergies[i], i);
+      }
+      for (int i  = 0; i < _others.length; i++){
+        loadBool(_others[i], _allergies.length+i);
+      }
     });
   }
 
@@ -88,26 +104,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Card(
                               //color: Colors.green,
                               margin: EdgeInsets.all(5),
-                              child: createInhalationList("Morgens", _morning, 0),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: new BorderSide(
+                                  color: Color.fromRGBO(0, 0, 200, 1),
+                                ),
+                              ),
+                              child:
+                                  createInhalationList("Morgens", _morning, 0),
                             ),
                             Card(
                               //color: Colors.green,
                               margin: EdgeInsets.all(5),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: new BorderSide(
+                                  color: Color.fromRGBO(0, 0, 200, 1),
+                                ),
+                              ),
                               child: createInhalationList("Mittags", _noon, 1),
                             ),
                             Card(
                               //color: Colors.blue,
                               margin: EdgeInsets.all(5),
-                              child: createInhalationList("Abends", _evening, 2),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: new BorderSide(
+                                  color: Color.fromRGBO(0, 0, 200, 1),
+                                ),
+                              ),
+                              child:
+                                  createInhalationList("Abends", _evening, 2),
                             ),
                             Card(
                               //color: Colors.green,
                               margin: EdgeInsets.all(5),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: new BorderSide(
+                                  color: Color.fromRGBO(0, 0, 200, 1),
+                                ),
+                              ),
                               child: createInhalationList("Nachts", _night, 3),
                             ),
                             Card(
                               //color: Colors.green,
                               margin: EdgeInsets.all(5),
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: new BorderSide(
+                                  color: Color.fromRGBO(0, 0, 200, 1),
+                                ),
+                              ),
                               child: createInhalationList(
                                   "Sport und Notfall", _demand, 4),
                             ),
@@ -135,93 +183,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Card(
                                 //color: Colors.green,
                                 margin: EdgeInsets.all(5),
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: new BorderSide(
+                                    color: Color.fromRGBO(0, 0, 200, 1),
+                                  ),
+                                ),
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
                                   padding: EdgeInsets.all(10),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Allergien",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      Divider(
-                                        color: Colors.black54,
-                                        thickness: 0.5,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Pollen-Esche"),
-                                          Switch(
-                                            value: true,
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Pollen-Birke"),
-                                          Switch(
-                                            value: true,
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Pollen-Buche"),
-                                          Switch(
-                                            value: true,
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                    children: createMemoryEntries(
+                                        _allergies, 0, "Allergien"),
                                   ),
                                 )),
                             Card(
                                 //color: Colors.green,
                                 margin: EdgeInsets.all(5),
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  side: new BorderSide(
+                                    color: Color.fromRGBO(0, 0, 200, 1),
+                                  ),
+                                ),
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
                                   padding: EdgeInsets.all(10),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Sonstige",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      Divider(
-                                        color: Colors.black54,
-                                        thickness: 0.5,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Staub wischen"),
-                                          Switch(
-                                            value: true,
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text("Bettwäsche waschen"),
-                                          Switch(
-                                            value: true,
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                                    children: createMemoryEntries(
+                                        _others, _allergies.length, "Sonstige"),
                                   ),
                                 )),
                           ],
@@ -244,7 +238,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget createInhalationList(String headline, List<Inhalation> list, int element) {
+  List<Widget> createMemoryEntries(
+      List<String> list, int index, String headline) {
+    List<Widget> l = new List();
+    l.add(
+      Text(
+        headline,
+        style: TextStyle(fontSize: 18),
+      ),
+    );
+    l.add(
+      Divider(
+        color: Colors.black54,
+        thickness: 0.5,
+      ),
+    );
+    for (int i = 0; i < list.length; i++) {
+      l.add(createSwitchEntry(list[i], i + index));
+    }
+    return l;
+  }
+
+  Widget createSwitchEntry(String s, int index) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(s),
+        Switch(
+          value: _memories[index],
+          onChanged: (bool value) {
+            setState(() {
+              _memories[index] = value;
+              setBool(s, value);
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget createInhalationList(
+      String headline, List<Inhalation> list, int element) {
     List<Widget> l = new List();
     l.add(
       new Text(
@@ -281,7 +315,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget addEntryButton(List<Inhalation> list, int index, int element) {
     return FlatButton(
       onPressed: () {
-        print("change entry");
+        //print("change entry");
         changeEntryDialog(list, index, element);
       },
       child: Row(
@@ -296,7 +330,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget createInhalationListItems(int index, List<Inhalation> list, int element) {
+  Widget createInhalationListItems(
+      int index, List<Inhalation> list, int element) {
     return ListTile(
       title: Text(
           list[index].getAmount().toString() + "x " + list[index].getSpray()),
@@ -330,13 +365,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void loadString(String key) async {
     setState(() {
-      print("Get data");
+      //("Get data");
       switch (key) {
         case 'userMorningSprays':
           String s = prefs.get(key) ?? "No Data";
-          print("s: " + s);
+          //print("s: " + s);
           _morning = _d.separateSpraysString(s);
-          print("Morning: " +_morning.length.toString());
+          //print("Morning: " + _morning.length.toString());
           break;
         case 'userNoonSprays':
           String s = prefs.get(key) ?? "No Data";
@@ -360,7 +395,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<Null> setString(String key, String g) async {
     await this.prefs.setString(key, g);
-    print("String saved");
+    //print("String saved");
+  }
+
+  void loadBool(String key, int index) async {
+    setState(() {
+      //print("Get data");
+      bool b = prefs.get(key) ?? false;
+      //print("bool: " + b.toString());
+      _memories[index] = b;
+    });
+  }
+
+  Future<Null> setBool(String key, bool b) async {
+    await this.prefs.setBool(key, b);
+    //print("Bool saved");
   }
 
   void changeEntryDialog(List<Inhalation> list, int index, int element) {
@@ -439,18 +488,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String getKeyByElement(int element){
+  String getKeyByElement(int element) {
     switch (element) {
-      case 0: return userMorningSprays;
-      break;
-      case 1: return userNoonSprays;
-      break;
-      case 2: return userEveningSprays;
-      break;
-      case 3: return userNightSprays;
-      break;
-      case 4: return userDemandSprays;
-      break;
+      case 0:
+        return userMorningSprays;
+        break;
+      case 1:
+        return userNoonSprays;
+        break;
+      case 2:
+        return userEveningSprays;
+        break;
+      case 3:
+        return userNightSprays;
+        break;
+      case 4:
+        return userDemandSprays;
+        break;
     }
   }
 }

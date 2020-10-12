@@ -97,6 +97,7 @@ class Diary{
           //print("number: " + number + " spray: " + spray + " dosis: " + dose);
           Inhalation i = new Inhalation(spray, int.parse(number));
           i.setDose(int.parse(dose));
+          i.setDone(false);
           erg.add(i);
         }
     }
@@ -114,6 +115,18 @@ class Diary{
 
   String getNotes(){
     return _notes;
+  }
+
+  int getDay(){
+    return _date.day;
+  }
+
+  int getMonth(){
+    return _date.month;
+  }
+
+  int getYear(){
+    return _date.year;
   }
 
   String createSpraysString(List<Inhalation> list){

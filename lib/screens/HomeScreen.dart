@@ -5,6 +5,7 @@ import 'package:asthma_tagebuch/helper/date_helper.dart';
 import 'package:asthma_tagebuch/helper/diary_database_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -21,6 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Inhalation> _noon;
   List<Inhalation> _evening;
   List<Inhalation> _night;
+  TextEditingController _notesController =  new TextEditingController();
+  String _notes;
   List<bool> _inhalationDone;
   List<String> _symptoms = [
     "Anstrengung beim Ausatmen",
@@ -41,22 +44,41 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   DateTime _visibleDay;
   List<bool> ratingButtons = [true, false, false];
+  List<bool> _symptomsAndSurroundingsChecked;
 
   final dbHelper = DiaryDatabaseHelper.instance;
+  SharedPreferences prefs;
+
+  static const String userMorningSprays = 'userMorningSprays';
+  static const String userNoonSprays = 'userNoonSprays';
+  static const String userEveningSprays = 'userEveningSprays';
+  static const String userNightSprays = 'userNightSprays';
 
   @override
   void initState() {
-    _d = new Diary(0, null, null, null, null, null, "", "", 0, 0, 0, "");
+    super.initState();
+    _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "");
     _reusableWidgets = new ReusableWidgets(context, _selectedIndex);
     _morning = new List<Inhalation>();
     _noon = new List<Inhalation>();
     _evening = new List<Inhalation>();
     _night = new List<Inhalation>();
     _inhalationDone = new List<bool>();
+    _symptomsAndSurroundingsChecked = new List<bool>();
+    for (int i = 0; i < _symptoms.length + _surroundings.length; i++ ){
+      _symptomsAndSurroundingsChecked.add(false);
+    }
     _visibleDay = new DateTime.now();
     _saveButtonOp = false;
-    createDayList();
     //dbHelper.insertList();
+    SharedPreferences.getInstance().then((sp) {
+      this.prefs = sp;
+      loadString(userMorningSprays);
+      loadString(userNoonSprays);
+      loadString(userEveningSprays);
+      loadString(userNightSprays);
+    });
+    createDayList();
   }
 
   @override
@@ -98,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: buildList(),
+                      children: buildInhalationList(),
                     ),
                   ),
                   Card(
@@ -108,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: buildSymptomsAndSurroundingsList(
-                          "Aufgetretene Symptome", _symptoms),
+                          "Aufgetretene Symptome", _symptoms, 0),
                     ),
                   ),
                   Card(
@@ -118,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: buildSymptomsAndSurroundingsList(
-                          "Umstände des Tages", _surroundings),
+                          "Umstände des Tages", _surroundings, _symptoms.length),
                     ),
                   ),
                   Card(
@@ -136,6 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: TextField(
                             onTap: showSaveButton,
                             onEditingComplete: showSaveButton,
+                            controller: _notesController,
+                            //TODO: Controller
                           ),
                         ),
                       ],
@@ -215,37 +239,45 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Widget> buildList() {
+  List<Widget> buildInhalationList() {
     List<Widget> list = new List();
     double sizePerDayTime = 100;
-    if (_morning.length != 0) {
-      list.add(getHeadline("Morgens"));
-      list.add(getDivider());
-      for (int i = 0; i < _morning.length; i++) {
-        list.add(_buildInhalationListItems(i, _morning, 0));
+    if (_morning.length+_noon.length+_evening.length+_night.length == 0){
+      list.add(Container(
+        padding: EdgeInsets.all(10),
+        color: Color.fromRGBO(0, 0, 200, 1),
+        child: Text("Bitte füge deine Sprays unter den Einstellungen hinzu", style: TextStyle(color: Colors.white),),
+      ));
+    } else {
+      if (_morning.length != 0) {
+        list.add(getHeadline("Morgens"));
+        list.add(getDivider());
+        for (int i = 0; i < _morning.length; i++) {
+          list.add(_buildInhalationListItems(i, _morning, 0));
+        }
       }
-    }
-    if (_noon.length != 0) {
-      list.add(getHeadline("Mittags"));
-      list.add(getDivider());
-      for (int i = 0; i < _noon.length; i++) {
-        list.add(_buildInhalationListItems(i, _noon, _morning.length));
+      if (_noon.length != 0) {
+        list.add(getHeadline("Mittags"));
+        list.add(getDivider());
+        for (int i = 0; i < _noon.length; i++) {
+          list.add(_buildInhalationListItems(i, _noon, _morning.length));
+        }
       }
-    }
-    if (_evening.length != 0) {
-      list.add(getHeadline("Abends"));
-      list.add(getDivider());
-      for (int i = 0; i < _evening.length; i++) {
-        list.add(_buildInhalationListItems(
-            i, _evening, _morning.length + _noon.length));
+      if (_evening.length != 0) {
+        list.add(getHeadline("Abends"));
+        list.add(getDivider());
+        for (int i = 0; i < _evening.length; i++) {
+          list.add(_buildInhalationListItems(
+              i, _evening, _morning.length + _noon.length));
+        }
       }
-    }
-    if (_night.length != 0) {
-      list.add(getHeadline("Nachts"));
-      list.add(getDivider());
-      for (int i = 0; i < _night.length; i++) {
-        list.add(_buildInhalationListItems(
-            i, _night, _morning.length + _noon.length + _evening.length));
+      if (_night.length != 0) {
+        list.add(getHeadline("Nachts"));
+        list.add(getDivider());
+        for (int i = 0; i < _night.length; i++) {
+          list.add(_buildInhalationListItems(
+              i, _night, _morning.length + _noon.length + _evening.length));
+        }
       }
     }
     return list;
@@ -283,25 +315,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSymptomsAndSurroundingsListItems(int index, List<String> l) {
+  Widget _buildSymptomsAndSurroundingsListItems(int index, List<String> l, int adding) {
     return ListTile(
       leading: Checkbox(
-        value: false,
+        value: _symptomsAndSurroundingsChecked[index+adding],
         onChanged: (bool value) {
-          //TODO
-          changedEntry(value, index, null);
+          changedEntry(value, index+adding, _symptomsAndSurroundingsChecked);
         },
       ),
       title: Text(l[index]),
     );
   }
 
-  List<Widget> buildSymptomsAndSurroundingsList(String s, List<String> l) {
+  List<Widget> buildSymptomsAndSurroundingsList(String s, List<String> l, int index) {
     List<Widget> list = new List();
     list.add(getHeadline(s));
     list.add(getDivider());
     for (int i = 0; i < l.length; i++) {
-      list.add(_buildSymptomsAndSurroundingsListItems(i, l));
+      list.add(_buildSymptomsAndSurroundingsListItems(i, l, index));
     }
     return list;
   }
@@ -353,11 +384,53 @@ class _HomeScreenState extends State<HomeScreen> {
           _inhalationDone.add(_night[i].getDone());
         }
         ;
+        List <String> symp = _d.separateStringByComma(_d.getSymptoms());
+        List <String> sur = _d.separateStringByComma(_d.getSurroundings());
+        for (int i = 0; i < symp.length; i++){
+          print("symptoms-i: " + i.toString());
+          for (int j = 0; j < _symptoms.length; j++){
+            if (symp[i] == _symptoms[j]){
+              _symptomsAndSurroundingsChecked[j] = true;
+            }
+          }
+        }
+        for (int i = 0; i < sur.length; i++){
+          for (int j = 0; j < _surroundings.length; j++){
+            if (sur[i] == _surroundings[j]){
+              _symptomsAndSurroundingsChecked[j+_symptoms.length] = true;
+            }
+          }
+        }
+        this._notesController.text = _d.getNotes();
       });
-    } catch (e) {
-      print("Datenbank-Fehler: " + e.toString());
-      //TODO: fuege neuen hinzu
+    } catch (ex) {
+      print("Datenbank-Fehler: " + ex.toString());
+      int id = int.parse(_visibleDay.day.toString() + _visibleDay.month.toString() + _visibleDay.year.toString());
+      int r;
+      for (int i = 0; i < ratingButtons.length; i++){
+        if (ratingButtons[i]){
+          r = i;
+        }
+      }
+      String m = _d.createSpraysString(_morning);
+      String no = _d.createSpraysString(_noon);
+      String e = _d.createSpraysString(_evening);
+      String ni = _d.createSpraysString(_night);
+      String symp = getSymptomsAndSurroundingsString(0, _symptoms);
+      String sur = getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
+
+      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day, _visibleDay.month, _visibleDay.year, "");
     }
+  }
+
+  String getSymptomsAndSurroundingsString(int index, List<String> list){
+    String erg = "";
+    for (int i = 0; i < list.length; i++){
+      if (_symptomsAndSurroundingsChecked[i+index]){
+        erg += list[i] + ",";
+      }
+    }
+    return erg;
   }
 
   void previousDay() {
@@ -385,7 +458,8 @@ class _HomeScreenState extends State<HomeScreen> {
   changedEntry(bool value, int index, List<bool> list) {
     setState(() {
       showSaveButton();
-      list[index] = value;
+      //print("value: " + value.toString() + " index: " + index.toString() + " list: " + _symptomsAndSurroundingsChecked[index].toString());
+      _symptomsAndSurroundingsChecked[index] = value;
     });
   }
 
@@ -399,8 +473,70 @@ class _HomeScreenState extends State<HomeScreen> {
     //TODO Daten speichern
     setState(() {
       _saveButtonOp = false;
-      //Notes, Symptoms, Others, Rating,
-      //_spraysMorning, etc. muessen erst ALLE aktualisiert werden (bool-Wert)
+
+      int id = int.parse(_visibleDay.day.toString() + _visibleDay.month.toString() + _visibleDay.year.toString());
+      int r;
+      for (int i = 0; i < ratingButtons.length; i++){
+        if (ratingButtons[i]){
+          r = i;
+        }
+      }
+      String m = _d.createSpraysString(_morning);
+      String no = _d.createSpraysString(_noon);
+      String e = _d.createSpraysString(_evening);
+      String ni = _d.createSpraysString(_night);
+      String symp = getSymptomsAndSurroundingsString(0, _symptoms);
+      String sur = getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
+      this._notes = _notesController.text;
+
+      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day, _visibleDay.month, _visibleDay.year, _notes);
+
+
+      Map<String, dynamic> map = {
+        DiaryDatabaseHelper.columnId: id,
+        DiaryDatabaseHelper.columnDay: _visibleDay.day,
+        DiaryDatabaseHelper.columnMonth: _visibleDay.month,
+        DiaryDatabaseHelper.columnYear: _visibleDay.year,
+        DiaryDatabaseHelper.columnSymptoms: symp,
+        DiaryDatabaseHelper.columnOthers: sur,
+        DiaryDatabaseHelper.columnRating: r,
+        DiaryDatabaseHelper.columnSpraysNight: ni,
+        DiaryDatabaseHelper.columnSpraysMorning: m,
+        DiaryDatabaseHelper.columnSpraysEvening: e,
+        DiaryDatabaseHelper.columnSpraysNoon: no,
+        DiaryDatabaseHelper.columnNotes: _notes
+      };
+      try {
+        dbHelper.update(map);
+      } catch (ex){
+        print("Fehler beim speichern: " + ex);
+      }
+
     });
   }
+
+  void loadString(String key) async {
+    setState(() {
+      //print("Get data");
+      switch (key) {
+        case 'userMorningSprays':
+          String s = prefs.get(key) ?? "No Data";
+          _morning = _d.separateSpraysString(s);
+          break;
+        case 'userNoonSprays':
+          String s = prefs.get(key) ?? "No Data";
+          _noon = _d.separateSpraysString(s);
+          break;
+        case 'userEveningSprays':
+          String s = prefs.get(key) ?? "No Data";
+          _evening = _d.separateSpraysString(s);
+          break;
+        case 'userNightSprays':
+          String s = prefs.get(key) ?? "No Data";
+          _night = _d.separateSpraysString(s);
+          break;
+      }
+    });
+  }
+
 }

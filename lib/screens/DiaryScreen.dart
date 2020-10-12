@@ -50,7 +50,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
             ". " +
             new DateHelper().getMonthName(_diaryList[index].getMonth()) +
             " " +
-            _diaryList[index].getYear().toString()),
+            _diaryList[index].getYear().toString() + " - Bewertung: " + _diaryList[index].getRatingAsString()),
       );
       l.add(getDivider());
     }

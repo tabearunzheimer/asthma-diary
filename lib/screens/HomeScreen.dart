@@ -13,7 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   Diary _d;
   bool _saveButtonOp;
   int _selectedIndex = 0;
@@ -22,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Inhalation> _noon;
   List<Inhalation> _evening;
   List<Inhalation> _night;
-  TextEditingController _notesController =  new TextEditingController();
+  TextEditingController _notesController = new TextEditingController();
   String _notes;
   List<bool> _inhalationDone;
   List<String> _symptoms = [
@@ -67,9 +66,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _inhalationDone = new List<bool>();
     _symptomsAndSurroundingsChecked = new List<bool>();
 
-    for (int i = 0; i < _symptoms.length + _surroundings.length; i++ ){
+    for (int i = 0; i < _symptoms.length + _surroundings.length; i++) {
       _symptomsAndSurroundingsChecked.add(false);
     }
+
     _visibleDay = new DateTime.now();
     _saveButtonOp = false;
     //dbHelper.insertList();
@@ -142,7 +142,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: buildSymptomsAndSurroundingsList(
-                          "Umstände des Tages", _surroundings, _symptoms.length),
+                          "Umstände des Tages",
+                          _surroundings,
+                          _symptoms.length),
                     ),
                   ),
                   Card(
@@ -244,12 +246,17 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> buildInhalationList() {
     List<Widget> list = new List();
     double sizePerDayTime = 100;
-    if (_morning.length+_noon.length+_evening.length+_night.length == 0){
-      list.add(Container(
-        padding: EdgeInsets.all(10),
-        color: Color.fromRGBO(0, 0, 200, 1),
-        child: Text("Bitte füge deine Sprays unter den Einstellungen hinzu", style: TextStyle(color: Colors.white),),
-      ));
+    if (_morning.length + _noon.length + _evening.length + _night.length == 0) {
+      list.add(
+        Container(
+          padding: EdgeInsets.all(10),
+          color: Color.fromRGBO(0, 0, 200, 1),
+          child: Text(
+            "Bitte füge deine Sprays unter den Einstellungen hinzu",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
     } else {
       if (_morning.length != 0) {
         list.add(getHeadline("Morgens"));
@@ -307,8 +314,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListTile(
       leading: Checkbox(
         value: _inhalationDone[len + index],
-        onChanged:  (bool value) {
-          changedEntry(value, len+index, _inhalationDone);
+        onChanged: (bool value) {
+          changedEntry(value, len + index, _inhalationDone, list, index);
         },
       ),
       title: Text(
@@ -320,16 +327,17 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSymptomsAndSurroundingsListItems(int index, List<String> l, int adding) {
     return ListTile(
       leading: Checkbox(
-        value: _symptomsAndSurroundingsChecked[index+adding],
+        value: _symptomsAndSurroundingsChecked[index + adding],
         onChanged: (bool value) {
-          changedEntry(value, index+adding, _symptomsAndSurroundingsChecked);
+          changedEntry(value, index + adding, _symptomsAndSurroundingsChecked, null, 0);
         },
       ),
       title: Text(l[index]),
     );
   }
 
-  List<Widget> buildSymptomsAndSurroundingsList(String s, List<String> l, int index) {
+  List<Widget> buildSymptomsAndSurroundingsList(
+      String s, List<String> l, int index) {
     List<Widget> list = new List();
     list.add(getHeadline(s));
     list.add(getDivider());
@@ -370,6 +378,8 @@ class _HomeScreenState extends State<HomeScreen> {
         _noon = _d.getSpraysList(1);
         _evening = _d.getSpraysList(2);
         _night = _d.getSpraysList(3);
+
+        _inhalationDone = new List();
         for (int i = 0; i < _morning.length; i++) {
           _inhalationDone.add(_morning[i].getDone());
         }
@@ -386,23 +396,33 @@ class _HomeScreenState extends State<HomeScreen> {
           _inhalationDone.add(_night[i].getDone());
         }
         ;
-        List <String> symp = _d.separateStringByComma(_d.getSymptoms());
-        List <String> sur = _d.separateStringByComma(_d.getSurroundings());
-        for (int i = 0; i < symp.length; i++){
-          print("symptoms-i: " + i.toString());
-          for (int j = 0; j < _symptoms.length; j++){
-            if (symp[i] == _symptoms[j]){
-              _symptomsAndSurroundingsChecked[j] = true;
+        List<String> symp = _d.separateStringByComma(_d.getSymptoms());
+        List<String> sur = _d.separateStringByComma(_d.getSurroundings());
+
+        _symptomsAndSurroundingsChecked = new List();
+        for (int i = 0; i < _symptoms.length; i++) {
+          _symptomsAndSurroundingsChecked.add(false);
+          for (int j = 0; j < symp.length; j++) {
+            if (symp[j] == _symptoms[i]) {
+              _symptomsAndSurroundingsChecked[i] = true;
+            }
+          }
+          //print("symptoms-i: " + i.toString() + " symp: " + symp.length.toString() + " bool: " + _symptomsAndSurroundingsChecked[i].toString());
+        }
+
+        int offset = _symptomsAndSurroundingsChecked.length == 0 ? 0 : -1;
+
+        for (int i = 0; i < _surroundings.length; i++) {
+          _symptomsAndSurroundingsChecked.add(false);
+          for (int j = 0; j < sur.length; j++) {
+            print("i: " + i.toString() + " j: " + j.toString() + " sur-length: " + _surroundings.length.toString());
+            if (sur[j] == _surroundings[i]) {
+              //print("check: " + _symptomsAndSurroundingsChecked.length.toString() + " o: " + (_symptomsAndSurroundingsChecked.length+offset).toString());
+              _symptomsAndSurroundingsChecked[_symptomsAndSurroundingsChecked.length+offset] = true;
             }
           }
         }
-        for (int i = 0; i < sur.length; i++){
-          for (int j = 0; j < _surroundings.length; j++){
-            if (sur[i] == _surroundings[j]){
-              _symptomsAndSurroundingsChecked[j+_symptoms.length] = true;
-            }
-          }
-        }
+        //print("checked: " + _symptomsAndSurroundingsChecked.length.toString() + " sym+sur: " + (_symptoms.length + _surroundings.length).toString());
         this._notesController.text = _d.getNotes();
       });
     } catch (ex) {
@@ -413,19 +433,23 @@ class _HomeScreenState extends State<HomeScreen> {
         loadString(userNoonSprays);
         loadString(userEveningSprays);
         loadString(userNightSprays);
+        _inhalationDone = new List();
+        _symptomsAndSurroundingsChecked = new List();
 
-        for (int i = 0; i < _morning.length + _noon.length + _evening.length + _night.length; i++){
+        for (int i = 0; i < _morning.length + _noon.length + _evening.length + _night.length; i++) {
           _inhalationDone.add(false);
         }
+        for (int i = 0; i < _symptoms.length + _surroundings.length; i++){
+          _symptomsAndSurroundingsChecked.add(false);
+        }
       });
-
     }
   }
 
-  String getSymptomsAndSurroundingsString(int index, List<String> list){
+  String getSymptomsAndSurroundingsString(int index, List<String> list) {
     String erg = "";
-    for (int i = 0; i < list.length; i++){
-      if (_symptomsAndSurroundingsChecked[i+index]){
+    for (int i = 0; i < list.length; i++) {
+      if (_symptomsAndSurroundingsChecked[i + index]) {
         erg += list[i] + ",";
       }
     }
@@ -454,16 +478,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  changedEntry(bool value, int index, List<bool> list) {
+  changedEntry(bool value, int index, List<bool> list, List<Inhalation> inh, int i) {
     setState(() {
       showSaveButton();
       //print("value: " + value.toString() + " index: " + index.toString() + " list: " + _symptomsAndSurroundingsChecked[index].toString());
       list[index] = value;
+      if (inh != null){
+        inh[i].setDone(value);
+      }
     });
   }
 
-  void showSaveButton(){
-    if (!_saveButtonOp){
+  void showSaveButton() {
+    if (!_saveButtonOp) {
       _saveButtonOp = true;
     }
   }
@@ -473,10 +500,12 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _saveButtonOp = false;
 
-      int id = int.parse(_visibleDay.day.toString() + _visibleDay.month.toString() + _visibleDay.year.toString());
+      int id = int.parse(_visibleDay.day.toString() +
+          _visibleDay.month.toString() +
+          _visibleDay.year.toString());
       int r;
-      for (int i = 0; i < ratingButtons.length; i++){
-        if (ratingButtons[i]){
+      for (int i = 0; i < ratingButtons.length; i++) {
+        if (ratingButtons[i]) {
           r = i;
         }
       }
@@ -485,11 +514,12 @@ class _HomeScreenState extends State<HomeScreen> {
       String e = _d.createSpraysString(_evening);
       String ni = _d.createSpraysString(_night);
       String symp = getSymptomsAndSurroundingsString(0, _symptoms);
-      String sur = getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
+      String sur =
+          getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
       this._notes = _notesController.text;
 
-      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day, _visibleDay.month, _visibleDay.year, _notes);
-
+      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day,
+          _visibleDay.month, _visibleDay.year, _notes);
 
       Map<String, dynamic> map = {
         DiaryDatabaseHelper.columnId: id,
@@ -507,11 +537,10 @@ class _HomeScreenState extends State<HomeScreen> {
       };
       try {
         dbHelper.update(map);
-      } catch (ex){
+      } catch (ex) {
         print("Fehler beim speichern: " + ex);
         dbHelper.insert(map);
       }
-
     });
   }
 
@@ -539,5 +568,4 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     });
   }
-
 }

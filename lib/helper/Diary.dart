@@ -129,6 +129,17 @@ class Diary{
     return _date.year;
   }
 
+  String getRatingAsString(){
+    switch (_rating){
+      case 0: return 'Gut';
+      break;
+      case 1: return 'Okay';
+      break;
+      case 2: return 'Schlecht';
+      break;
+    }
+  }
+
   String createSpraysString(List<Inhalation> list){
     String erg = "";
     for (int i = 0; i < list.length; i++){

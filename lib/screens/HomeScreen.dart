@@ -163,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             onTap: showSaveButton,
                             onEditingComplete: showSaveButton,
                             controller: _notesController,
-                            //TODO: Controller
                           ),
                         ),
                       ],
@@ -496,7 +495,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void saveButtonPressed() {
-    //TODO Daten speichern
     setState(() {
       _saveButtonOp = false;
 

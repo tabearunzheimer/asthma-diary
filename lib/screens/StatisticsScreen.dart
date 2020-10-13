@@ -34,39 +34,69 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     return Scaffold(
       appBar: _reusableWidgets.getNormalAppBar(),
       body: Container(
-        child: Container(
-          color: Colors.red,
-          height: 320,
-          //margin: EdgeInsets.only(top: 500, bottom: 0),
-          width: MediaQuery.of(context).size.width,
-          child: GestureDetector(
-            onHorizontalDragStart: (DragStartDetails details) =>
-                dragStart(context, details),
-            onHorizontalDragUpdate: (DragUpdateDetails details) =>
-                dragUpdate(context, details),
-            onHorizontalDragDown: (DragDownDetails details) =>
-                dragDown(context, details),
-            child: AnimatedBuilder(
-              animation: this._controller,
-              builder: (BuildContext context, Widget child) {
-                return CustomPaint(
-                  painter: CustomStatisticPainter(
-                    animation: this._controller,
-                    backgroundColor: Colors.white,
-                    color: Theme.of(context).accentColor,
-                    posX: this._posx,
-                    anzahlWerteX: this._months.length,
-                    anzahlWerteY: this._yValues.length,
-                    werteY: this._yValues,
-                    werteX: this._months,
+
+        child: Card(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              getHeadline("Statistik"),
+              getDivider(),
+              Container(
+                child: Container(
+                  //color: Colors.red,
+                  height: 320,
+                  //margin: EdgeInsets.only(top: 500, bottom: 0),
+                  width: MediaQuery.of(context).size.width,
+                  child: GestureDetector(
+                    onHorizontalDragStart: (DragStartDetails details) =>
+                        dragStart(context, details),
+                    onHorizontalDragUpdate: (DragUpdateDetails details) =>
+                        dragUpdate(context, details),
+                    onHorizontalDragDown: (DragDownDetails details) =>
+                        dragDown(context, details),
+                    child: AnimatedBuilder(
+                      animation: this._controller,
+                      builder: (BuildContext context, Widget child) {
+                        return CustomPaint(
+                          painter: CustomStatisticPainter(
+                            animation: this._controller,
+                            backgroundColor: Colors.white,
+                            color: Theme.of(context).accentColor,
+                            posX: this._posx,
+                            anzahlWerteX: this._months.length,
+                            anzahlWerteY: this._yValues.length,
+                            werteY: this._yValues,
+                            werteX: this._months,
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
       bottomNavigationBar: _reusableWidgets.getBottomNavigationBar(),
+    );
+  }
+
+  Widget getHeadline(String t) {
+    return new Container(
+      padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+      child: Text(
+        t,
+        style: TextStyle(fontSize: 20),
+      ),
+    );
+  }
+
+  Widget getDivider() {
+    return new Divider(
+      color: Colors.black54,
+      indent: 10,
+      endIndent: 10,
     );
   }
 

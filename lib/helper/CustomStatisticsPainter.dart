@@ -37,14 +37,14 @@ class CustomStatisticPainter extends CustomPainter {
 
 
     ///vertical line, y axis
-    Offset oS = Offset(abstandVomRand, size.height - abstandVomRand);
+    Offset oS = Offset(abstandVomRand, size.height - abstandVomRand*2);
     Offset oE = Offset(abstandVomRand, abstandVomRand*2 );
     canvas.drawLine(oS, oE, paint);
 
 
     ///horizontal line, x axis
-    oS = Offset(abstandVomRand, size.height - abstandVomRand);
-    oE = Offset(size.width - abstandVomRand, size.height - abstandVomRand);
+    oS = Offset(abstandVomRand, size.height - abstandVomRand*2);
+    oE = Offset(size.width - abstandVomRand, size.height - abstandVomRand*2);
     canvas.drawLine(oS, oE, paint);
 
     ///checks if the given position runs over the width
@@ -70,9 +70,9 @@ class CustomStatisticPainter extends CustomPainter {
     oS = Offset(posXNew, abstandVomRand+20);
     oE = Offset(posXNew + 5, abstandVomRand+10);
     canvas.drawLine(oS, oE, paint);
-    paint.color = Colors.black12;
+    paint.color = Colors.black26;
     ///dashed line showing where the pointer is pointing to
-    for (double i = abstandVomRand+30; i < size.height - 30; i += 20) {
+    for (double i = abstandVomRand*2; i < size.height - abstandVomRand*2; i += 20) {
       oS = Offset(posXNew, i);
       oE = Offset(posXNew, i + 10);
       canvas.drawLine(oS, oE, paint);
@@ -87,30 +87,46 @@ class CustomStatisticPainter extends CustomPainter {
 
     ///draws the function as line
     paint.color = Colors.black;
+    paint.strokeWidth = 1.5;
     double abstandX = (size.width-2*abstandVomRand)/anzahlWerteX;
-    double abstandY = (size.height-3*abstandVomRand)/hoechsterWert;
-    print("x: $abstandX y: $abstandY");
-    print("width: ${size.width}");
+    double abstandY = (size.height-4*abstandVomRand)/hoechsterWert;
 
     int index = 0;
     for (double x = abstandVomRand; x < size.width-abstandVomRand; x += abstandX){
         if (index == 0){
-          double y =  (size.height-abstandVomRand);
-
-          y -= werteY[index] * abstandY;
-          print("y: ${werteY[index]}\n\n");
-          oS = new Offset(x, (size.height-abstandVomRand) - werteY[index] * abstandY);
+          oS = new Offset(x, (size.height-abstandVomRand*2) - werteY[index] * abstandY);
         } else {
-          oE = new Offset(x, (size.height-abstandVomRand) - werteY[index] * abstandY);
+          oE = new Offset(x, (size.height-abstandVomRand*2) - werteY[index] * abstandY);
           canvas.drawLine(oS, oE, paint);
-          print("oS-X: ${oS.dx} y: ${oS.dy}\noE-x: ${oE.dx} y: ${oE.dy} + index $index\n\n");
+          //print("os-x: ${oS.dx}\noe-x: ${oE.dx} index + ${werteY[index]}\n\n");
           oS = oE;
         }
-
         index++;
     }
 
+    ///draw y-index-lines
+    index = 0;
+    for (double y = abstandVomRand*2; y < size.height-abstandVomRand*2; y+=(size.height-4*abstandVomRand)/5){
+      paint.color = Colors.black12;
+      paint.strokeWidth = 1;
+      ///dashed line showing where the pointer is pointing to
+      for (double x = abstandVomRand; x < size.width - abstandVomRand; x += 20) {
+        oS = Offset(x, y);
+        oE = Offset(x+10, y);
+        canvas.drawLine(oS, oE, paint);
+      }
+    }
 
+    index = 0;
+    for (double y = size.height-abstandVomRand*2-8; y > abstandVomRand*2-10; y-=(size.height-4*abstandVomRand)/5){
+      int text = (hoechsterWert / 5 * index).round();
+      TextSpan span = new TextSpan(style: new TextStyle(color: Colors.black), text: text.toString());
+      TextPainter tp = new TextPainter(text: span, textAlign: TextAlign.left, textDirection: TextDirection.ltr);
+      tp.layout();
+      oS = Offset(5, y);
+      tp.paint(canvas, oS);
+      index--;
+    }
 
   }
 

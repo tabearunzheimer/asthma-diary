@@ -1,6 +1,7 @@
 import 'package:asthma_tagebuch/helper/Diary.dart';
 import 'package:asthma_tagebuch/helper/Inhalation.dart';
 import 'package:asthma_tagebuch/helper/Reusable_Widgets.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -426,6 +427,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               filled: true,
               labelText: "Anzahl der Hübe/ Tabletten",
             ),
+            keyboardType: TextInputType.numberWithOptions(
+              decimal: false,
+              signed: true,
+            ),
           ),
           Container(
             height: 20,
@@ -436,6 +441,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               filled: true,
               labelText: "Name des Medikaments",
             ),
+            keyboardType: TextInputType.text,
           ),
           Container(
             height: 20,
@@ -445,6 +451,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             decoration: InputDecoration(
               filled: true,
               labelText: "Dosierung des Medikaments in ug",
+            ),
+            keyboardType: TextInputType.numberWithOptions(
+              decimal: false,
+              signed: true,
             ),
           ),
           Row(
@@ -471,14 +481,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: () {
                   //setString(userNameKey, _nametext.text);
                   setState(() {
-                    Inhalation i = new Inhalation(
-                        _sprayName.text, int.parse(_sprayAmount.text));
-                    i.setDose(int.parse(_sprayDose.text));
-                    list.add(i);
-                    String s = _d.createSpraysStringWithoutDone(list);
-                    setString(getKeyByElement(element), s);
+                    //value = value.replaceAll(new RegExp(r"\s+"), "");
+                    if (_sprayName.text.contains(new RegExp(r"[0-9\,\;]+"))){
+                      Flushbar(
+                        title: "Hinweis",
+                        message: "In dem Namen des Sprays dürfen keine Sonderzeichen angegeben werden.",
+                        backgroundColor: Colors.black54,
+                        margin: EdgeInsets.all(10),
+                        borderRadius: 10,
+                        duration: Duration(seconds: 3),
+                      )..show(context);
+                    } else {
+                      Inhalation i = new Inhalation(
+                          _sprayName.text, int.parse(_sprayAmount.text));
+                      i.setDose(int.parse(_sprayDose.text));
+                      list.add(i);
+                      String s = _d.createSpraysStringWithoutDone(list);
+                      setString(getKeyByElement(element), s);
+                      deleteInput();
+                      Navigator.pop(context);
+                    }
                   });
-                  Navigator.pop(context);
+
                 },
               ),
             ],
@@ -486,6 +510,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  void deleteInput(){
+    _sprayName.text = "";
+    _sprayDose.text = "";
+    _sprayAmount.text = "";
   }
 
   String getKeyByElement(int element) {

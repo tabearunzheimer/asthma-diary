@@ -87,7 +87,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                     setState(() {
                       _visibleMonth = new DateTime(
                           _visibleMonth.year, _visibleMonth.month - 1);
-                          //TODO reset Values
+                      getInhalationSpraysAsWidget();
+                      buttons = new List();
+                      buttonLoaded = false;
+                      buttonsActivated = new List();
+                      _yValues1 = new List();
+                      _yValues2 = new List();
+                      _yValues3 = new List();
+                      _yValues4 = new List();
+                      getInhalationSpraysAsWidget();
                     });
                   },
                 ),
@@ -98,9 +106,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   icon: Icon(Icons.arrow_forward_ios),
                   onPressed: () {
                     setState(() {
-                      _visibleMonth = new DateTime(
-                          _visibleMonth.year, _visibleMonth.month + 1);
-                      //TODO reset Values
+                      _visibleMonth = new DateTime(_visibleMonth.year, _visibleMonth.month + 1);
+                      buttons = new List();
+                      buttonLoaded = false;
+                      buttonsActivated = new List();
+                      _yValues1 = new List();
+                      _yValues2 = new List();
+                      _yValues3 = new List();
+                      _yValues4 = new List();
+                      getInhalationSpraysAsWidget();
                     });
                   },
                 ),
@@ -134,18 +148,19 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                     alignment: WrapAlignment.start,
                     runSpacing: 10,
                     spacing: 10,
-                    children: buttonLoaded ? buttons : [
-                      Container(
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(
-                        ),
-                      ),
-                      Container(
-                        child: Text("Bitte warte kurz"),
-                        alignment: Alignment.center,
-                        margin: EdgeInsets.only(bottom: 50),
-                      ),
-                    ],
+                    children: buttonLoaded
+                        ? buttons
+                        : [
+                            Container(
+                              alignment: Alignment.center,
+                              child: CircularProgressIndicator(),
+                            ),
+                            Container(
+                              child: Text("Bitte warte kurz"),
+                              alignment: Alignment.center,
+                              margin: EdgeInsets.only(bottom: 50),
+                            ),
+                          ],
                   ),
                 ),
               ],
@@ -204,7 +219,10 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     List<dynamic> l = new List();
     if (s == "Symptome") {
       l = statHelper.getAmountOfSymptomsForAMonth(_visibleMonth.month);
-    } else if (s.contains("Morgens") || s.contains("Mittags") || s.contains("Abends") ||s.contains("Nachts")){
+    } else if (s.contains("Morgens") ||
+        s.contains("Mittags") ||
+        s.contains("Abends") ||
+        s.contains("Nachts")) {
       //Medikament
       l = statHelper.getTakenSprayForAMonth(s, _visibleMonth.month);
     } else {
@@ -324,7 +342,6 @@ class _StatisticsScreenState extends State<StatisticsScreen>
         buttons.add(buildButton("Krank", buttons.length, Colors.white));
         buttons.add(buildButton("Putzen", buttons.length, Colors.white));
         buttons.add(buildButton("Sport", buttons.length, Colors.white));
-
       }
     }
     setState(() {

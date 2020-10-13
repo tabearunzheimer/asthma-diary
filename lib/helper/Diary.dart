@@ -110,6 +110,8 @@ class Diary{
 
     for (int i = 0; i < inh.length; i++){
       String value = inh[i].getAmount() .toString()+ "," + inh[i].getSpray() + "," + inh[i].getDose().toString();
+      value = value.replaceAll(new RegExp(r"\s+"), "");
+      print("value: $value");
       if (key == value && inh[i].getDone()){
         return true;
       }

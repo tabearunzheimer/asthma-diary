@@ -17,9 +17,8 @@ class MyApp extends StatelessWidget {
         accentColor: Color.fromRGBO(0, 0, 200, 1),
         primaryColor: Colors.black,
 
-        //fontFamily: 'Staatliches',
+        fontFamily: 'Roboto',
         primaryTextTheme: TextTheme(
-            body1: TextStyle(color: Colors.black),
           button: TextStyle(color: Colors.black)
         ),
 

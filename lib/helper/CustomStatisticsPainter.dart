@@ -161,6 +161,16 @@ class CustomStatisticPainter extends CustomPainter {
         index++;
       }
 
+        TextSpan span = new TextSpan(style: new TextStyle(color: Colors.black), text: this.werteX[0]);
+        TextPainter tp = new TextPainter(text: span, textAlign: TextAlign.left, textDirection: TextDirection.ltr);
+        tp.layout();
+        tp.paint(canvas, new Offset(abstandVomRand, size.height-abstandVomRand*2+5));
+        span = new TextSpan(style: new TextStyle(color: Colors.black), text: this.werteX[this.werteX.length-1]);
+        tp = new TextPainter(text: span, textAlign: TextAlign.right, textDirection: TextDirection.ltr);
+        tp.layout();
+        tp.paint(canvas, new Offset(oE.dx-(this.werteX.length*10), size.height-abstandVomRand*2+5));
+
+
     }
 
     paint.color = Colors.black;

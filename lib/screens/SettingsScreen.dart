@@ -455,7 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   setState(() {
                     list.removeAt(index);
                     String s = _d.createSpraysStringWithoutDone(list);
-                    setString(userMorningSprays, s);
+                    setString(getKeyByElement(element), s);
                   });
                   Navigator.pop(context);
                 },
@@ -506,5 +506,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return userDemandSprays;
         break;
     }
+    return "";
   }
 }

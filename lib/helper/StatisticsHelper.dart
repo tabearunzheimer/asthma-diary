@@ -2,6 +2,7 @@ import 'package:asthma_tagebuch/helper/Inhalation.dart';
 import 'package:asthma_tagebuch/helper/date_helper.dart';
 import 'package:asthma_tagebuch/helper/diary_database_helper.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'Diary.dart';
 
@@ -63,7 +64,7 @@ class StatisticsHelper {
     } else {
       kp = 4;
     }
-    print(l[kp]);
+
     for (int j = 0; j < l[kp].length; j++) {
       if (l[kp][j] != '(' && l[kp][j] != ')') {
         h += l[kp][j];
@@ -72,8 +73,10 @@ class StatisticsHelper {
     dose = int.parse(h);
 
     String key = amount.toString() + "," + s + "," + dose.toString();
+    print(key);
     for (int i = 0; i < _allEntries.length; i++) {
       erg.add(_allEntries[i].searchListAndGetDone(key, dt));
+      print(erg[i]);
     }
 
     int amountTrue = 0;
@@ -82,6 +85,7 @@ class StatisticsHelper {
         amountTrue++;
       }
     }
+    print("amount: $amountTrue");
     if (amountTrue < 2) {
       return new List();
     }
@@ -292,6 +296,15 @@ class StatisticsHelper {
         }
       }
     }
+
+    for(int i = 0; i < erg.length; i++){
+      for (int j = 0; j < erg.length; j++){
+        if (erg[i] == erg[j] && i != j){
+          erg.removeAt(j);
+        }
+      }
+    }
+
     print("erg: " + erg.length.toString());
     return erg;
   }

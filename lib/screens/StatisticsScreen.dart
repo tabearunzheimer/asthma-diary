@@ -326,8 +326,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
   Future getInhalationSpraysAsWidget() async {
     await statHelper.getDatabaseEntries();
-    List<String> data = await statHelper
-        .getAllUsedSpraysWithDayTimeByMonth(_visibleMonth.month);
+    List<String> data = await statHelper.getAllUsedSpraysWithDayTimeByMonth(_visibleMonth.month);
 
     for (int i = 0; i < data.length; i++) {
       print("buttons");

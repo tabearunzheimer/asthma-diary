@@ -35,6 +35,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   ];
 
   List<Widget> buttons;
+  List<int> activatedButtonsOrder;
   DateTime _visibleMonth;
 
   List<bool> buttonsActivated;
@@ -53,6 +54,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     _canvasActivated = [false, false, false, false];
 
     activated = 0;
+    activatedButtonsOrder = new List();
     _yValues1 = new List();
     _yValues2 = new List();
     _yValues3 = new List();
@@ -90,6 +92,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                       getInhalationSpraysAsWidget();
                       buttons = new List();
                       buttonLoaded = false;
+                      activatedButtonsOrder = new List();
                       buttonsActivated = new List();
                       _yValues1 = new List();
                       _yValues2 = new List();
@@ -109,6 +112,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                       _visibleMonth = new DateTime(_visibleMonth.year, _visibleMonth.month + 1);
                       buttons = new List();
                       buttonLoaded = false;
+                      activatedButtonsOrder = new List();
                       buttonsActivated = new List();
                       _yValues1 = new List();
                       _yValues2 = new List();
@@ -230,9 +234,23 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       l = statHelper.getSurroundingsTakenForAMonth(_visibleMonth.month, s);
     }
 
+
     if (l.length != 0) {
+      int pos;
+      bool posFound = false;
+      for (int i = 0; i < activatedButtonsOrder.length; i++){
+        if (activatedButtonsOrder[i] == -1){
+          pos = i;
+          posFound = true;
+        }
+      }
+      if (activatedButtonsOrder.length == 0 || !posFound){
+        activatedButtonsOrder.add(index);
+        pos = activatedButtonsOrder.length-1;
+      }
+
       setState(() {
-        switch (activated - 1) {
+        switch (pos) {
           case 0:
             _yValues1 = l;
             break;
@@ -246,10 +264,11 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             _yValues4 = l;
             break;
         }
-        _canvasActivated[activated - 1] = true;
+        activatedButtonsOrder[pos] = index;
+        _canvasActivated[pos] = true;
         _xValues = statHelper.getDaysForAMonth(_visibleMonth.month);
         //print(_xValues.length);
-        buttons[index] = buildButton(s, index, colors[activated - 1]);
+        buttons[index] = buildButton(s, index, colors[pos]);
       });
     } else {
       print("kein eintrag");
@@ -269,8 +288,15 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   }
 
   void hideStatistic(String s, int index) {
+    int pos;
+    for (int i = 0; i < activatedButtonsOrder.length; i++){
+      if (activatedButtonsOrder[i] == index){
+        pos = i;
+      }
+    }
+    print("pos $pos");
     setState(() {
-      switch (activated) {
+      switch (pos) {
         case 0:
           _yValues1 = new List();
           break;
@@ -284,8 +310,9 @@ class _StatisticsScreenState extends State<StatisticsScreen>
           _yValues4 = new List();
           break;
       }
+      activatedButtonsOrder[pos] = -1;
       _xValues = statHelper.getDaysForAMonth(_visibleMonth.month);
-      _canvasActivated[activated] = false;
+      _canvasActivated[pos] = false;
       print(_xValues.length);
       buttons[index] = buildButton(s, index, Colors.white);
     });

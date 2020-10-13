@@ -73,10 +73,10 @@ class StatisticsHelper {
     dose = int.parse(h);
 
     String key = amount.toString() + "," + s + "," + dose.toString();
-    print(key);
+    //print(key);
     for (int i = 0; i < _allEntries.length; i++) {
       erg.add(_allEntries[i].searchListAndGetDone(key, dt));
-      print(erg[i]);
+      //print(erg[i]);
     }
 
     int amountTrue = 0;
@@ -85,7 +85,7 @@ class StatisticsHelper {
         amountTrue++;
       }
     }
-    print("amount: $amountTrue");
+    //print("amount: $amountTrue");
     if (amountTrue < 2) {
       return new List();
     }
@@ -129,7 +129,7 @@ class StatisticsHelper {
       }
     }
     for (int i = 0; i < erg.length; i++) {
-      print("list: " + erg[i].toString());
+      //print("list: " + erg[i].toString());
     }
     if (!atLeastOneTrue) {
       return new List();
@@ -332,7 +332,7 @@ class StatisticsHelper {
       }
     }
 
-    print("erg: " + erg.length.toString());
+    //print("erg: " + erg.length.toString());
     return erg;
   }
 

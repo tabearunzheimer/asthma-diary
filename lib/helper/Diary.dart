@@ -105,6 +105,18 @@ class Diary{
     return erg;
   }
 
+  bool searchListAndGetDone(String key, int listNumber){
+    List<Inhalation> inh = getSpraysList(listNumber);
+
+    for (int i = 0; i < inh.length; i++){
+      String value = inh[i].getAmount() .toString()+ "," + inh[i].getSpray() + "," + inh[i].getDose().toString();
+      if (key == value && inh[i].getDone()){
+        return true;
+      }
+    }
+    return false;
+  }
+
   String getSymptoms(){
     return _symptoms;
   }

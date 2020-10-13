@@ -3,6 +3,7 @@ import 'package:asthma_tagebuch/helper/Inhalation.dart';
 import 'package:asthma_tagebuch/helper/Reusable_Widgets.dart';
 import 'package:asthma_tagebuch/helper/date_helper.dart';
 import 'package:asthma_tagebuch/helper/diary_database_helper.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _notes;
   List<bool> _inhalationDone;
   List<String> _symptoms = [
+    "Allergische Reaktion",
     "Anstrengung beim Ausatmen",
     "Atemnot",
     "Brustschmerzen",
@@ -34,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     "Pfeifen"
   ];
   List<String> _surroundings = [
-    "Allergische Reaktion",
     "Angst/ Panik",
     "Bedarfsmedikation genommen",
     "Bettzeug waschen",
@@ -314,6 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
       leading: Checkbox(
         value: _inhalationDone[len + index],
         onChanged: (bool value) {
+          list[index].setDone(value);
           changedEntry(value, len + index, _inhalationDone, list, index);
         },
       ),
@@ -534,12 +536,44 @@ class _HomeScreenState extends State<HomeScreen> {
         DiaryDatabaseHelper.columnNotes: _notes
       };
       try {
-        dbHelper.update(map);
+        checkForEntryAndSave(map, id);
+        print("Saved");
+        Flushbar(
+          title: "Hinweis",
+          message: "Eintrag gespeichert.",
+          backgroundColor: Colors.black54,
+          margin: EdgeInsets.all(10),
+          borderRadius: 10,
+          duration: Duration(seconds: 3),
+        )..show(context);
       } catch (ex) {
         print("Fehler beim speichern: " + ex);
         dbHelper.insert(map);
+        Flushbar(
+          title: "Hinweis",
+          message: "Fehler beim speichern. Bitte versuche es erneut.",
+          backgroundColor: Colors.black54,
+          margin: EdgeInsets.all(10),
+          borderRadius: 10,
+          duration: Duration(seconds: 3),
+        )..show(context);
       }
     });
+
+  }
+
+  void checkForEntryAndSave (Map<String, dynamic> map, int id) async {
+    List l = await dbHelper.getList(id);
+    if (l.length == 0){
+      dbHelper.insert(map);
+    } else {
+      dbHelper.update(map);
+    }
+  }
+
+  void rowCount() async {
+    int c = await dbHelper.queryRowCount();
+    print("Row-Count: " + c.toString());
   }
 
   void loadString(String key) async {

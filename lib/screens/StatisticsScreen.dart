@@ -1,5 +1,9 @@
 import 'package:asthma_tagebuch/helper/CustomStatisticsPainter.dart';
 import 'package:asthma_tagebuch/helper/Reusable_Widgets.dart';
+import 'package:asthma_tagebuch/helper/StatisticsHelper.dart';
+import 'package:asthma_tagebuch/helper/date_helper.dart';
+import 'package:flushbar/flushbar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -14,9 +18,28 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   double _posx = 100.0;
   AnimationController _controller;
   bool _tapInProgress;
+  StatisticsHelper statHelper;
 
-  List<int> _yValues = [1, 0, 5, 15, 10, 7];
-  List<String> _months = ["5", "10", "15", "20", "25", "30"];
+  bool buttonLoaded = false;
+
+  List<dynamic> _yValues1;
+  List<dynamic> _yValues2;
+  List<dynamic> _yValues3;
+  List<dynamic> _yValues4;
+  List<dynamic> _xValues;
+  List<Color> colors = [
+    Color.fromRGBO(200, 0, 0, 1),
+    Color.fromRGBO(0, 200, 0, 1),
+    Color.fromRGBO(0, 0, 200, 1),
+    Color.fromRGBO(200, 250, 0, 1),
+  ];
+
+  List<Widget> buttons;
+  DateTime _visibleMonth;
+
+  List<bool> buttonsActivated;
+  List<bool> _canvasActivated;
+  int activated;
 
   @override
   void initState() {
@@ -25,6 +48,21 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       vsync: this,
     );
     this._tapInProgress = false;
+    statHelper = new StatisticsHelper();
+    buttonsActivated = new List();
+    _canvasActivated = [false, false, false, false];
+
+    activated = 0;
+    _yValues1 = new List();
+    _yValues2 = new List();
+    _yValues3 = new List();
+    _yValues4 = new List();
+
+    _visibleMonth = new DateTime.now();
+
+    buttons = new List();
+
+    getInhalationSpraysAsWidget();
   }
 
   @override
@@ -33,53 +71,265 @@ class _StatisticsScreenState extends State<StatisticsScreen>
 
     return Scaffold(
       appBar: _reusableWidgets.getNormalAppBar(),
-      body: Container(
-
-        child: Card(
+      body: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              getHeadline("Statistik"),
-              getDivider(),
-              Container(
-                child: Container(
-                  //color: Colors.red,
-                  height: 320,
-                  //margin: EdgeInsets.only(top: 500, bottom: 0),
-                  width: MediaQuery.of(context).size.width,
-                  child: GestureDetector(
-                    onHorizontalDragStart: (DragStartDetails details) =>
-                        dragStart(context, details),
-                    onHorizontalDragUpdate: (DragUpdateDetails details) =>
-                        dragUpdate(context, details),
-                    onHorizontalDragDown: (DragDownDetails details) =>
-                        dragDown(context, details),
-                    child: AnimatedBuilder(
-                      animation: this._controller,
-                      builder: (BuildContext context, Widget child) {
-                        return CustomPaint(
-                          painter: CustomStatisticPainter(
-                            animation: this._controller,
-                            backgroundColor: Colors.white,
-                            color: Theme.of(context).accentColor,
-                            posX: this._posx,
-                            anzahlWerteX: this._months.length,
-                            anzahlWerteY: this._yValues.length,
-                            werteY: this._yValues,
-                            werteX: this._months,
-                          ),
-                        );
-                      },
-                    ),
+        children: [
+          Card(
+            shape: new RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () {
+                    setState(() {
+                      _visibleMonth = new DateTime(
+                          _visibleMonth.year, _visibleMonth.month - 1);
+                          //TODO reset Values
+                    });
+                  },
+                ),
+                Text(new DateHelper().getMonthName(_visibleMonth.month) +
+                    " " +
+                    _visibleMonth.year.toString()),
+                IconButton(
+                  icon: Icon(Icons.arrow_forward_ios),
+                  onPressed: () {
+                    setState(() {
+                      _visibleMonth = new DateTime(
+                          _visibleMonth.year, _visibleMonth.month + 1);
+                      //TODO reset Values
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Card(
+            shape: new RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            margin: EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getHeadline("Statistik"),
+                getDivider(),
+                Container(
+                  child: Stack(
+                    children: [
+                      buildStatisticsAnimation(0, _yValues1),
+                      buildStatisticsAnimation(1, _yValues2),
+                      buildStatisticsAnimation(2, _yValues3),
+                      buildStatisticsAnimation(3, _yValues4),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  //color: Colors.green,
+                  margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                  padding: EdgeInsets.all(5),
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    runSpacing: 10,
+                    spacing: 10,
+                    children: buttonLoaded ? buttons : [
+                      Container(
+                        alignment: Alignment.center,
+                        child: CircularProgressIndicator(
+                        ),
+                      ),
+                      Container(
+                        child: Text("Bitte warte kurz"),
+                        alignment: Alignment.center,
+                        margin: EdgeInsets.only(bottom: 50),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        ],
+      )),
       bottomNavigationBar: _reusableWidgets.getBottomNavigationBar(),
     );
+  }
+
+  Widget buildButton(String text, int index, Color c) {
+    buttonsActivated.add(false);
+    return Container(
+      width: (text.length * 15) / 1,
+      height: 50.0,
+      child: RaisedButton(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: new BorderSide(
+            color: buttonsActivated[index] ? c : Color.fromRGBO(0, 0, 200, 1),
+          ),
+        ),
+        color: buttonsActivated[index] ? c.withOpacity(0.2) : Colors.white,
+        child: Text(text),
+        onPressed: () {
+          if (activated < 4 && !buttonsActivated[index]) {
+            setState(() {
+              activated++;
+              buttonsActivated[index] = true;
+              showStatistic(text, index);
+            });
+          } else if (activated == 4 && !buttonsActivated[index]) {
+            Flushbar(
+              title: "Hinweis",
+              message: "Es können nicht mehr als 4 Objekte gewählt werden.",
+              backgroundColor: Colors.black54,
+              margin: EdgeInsets.all(10),
+              borderRadius: 10,
+              duration: Duration(seconds: 3),
+            )..show(context);
+          } else {
+            setState(() {
+              activated--;
+              buttonsActivated[index] = false;
+              buttons[index] = buildButton(text, index, Colors.white);
+              hideStatistic(text, index);
+            });
+          }
+        },
+      ),
+    );
+  }
+
+  void showStatistic(String s, int index) {
+    List<dynamic> l = new List();
+    if (s == "Symptome") {
+      l = statHelper.getAmountOfSymptomsForAMonth(_visibleMonth.month);
+    } else if (s.contains("Morgens") || s.contains("Mittags") || s.contains("Abends") ||s.contains("Nachts")){
+      //Medikament
+      l = statHelper.getTakenSprayForAMonth(s, _visibleMonth.month);
+    } else {
+      //Umstaende
+      l = statHelper.getSurroundingsTakenForAMonth(_visibleMonth.month, s);
+    }
+
+    if (l.length != 0) {
+      setState(() {
+        switch (activated - 1) {
+          case 0:
+            _yValues1 = l;
+            break;
+          case 1:
+            _yValues2 = l;
+            break;
+          case 2:
+            _yValues3 = l;
+            break;
+          case 3:
+            _yValues4 = l;
+            break;
+        }
+        _canvasActivated[activated - 1] = true;
+        _xValues = statHelper.getDaysForAMonth(_visibleMonth.month);
+        //print(_xValues.length);
+        buttons[index] = buildButton(s, index, colors[activated - 1]);
+      });
+    } else {
+      print("kein eintrag");
+      setState(() {
+        activated--;
+        buttonsActivated[index] = false;
+      });
+      Flushbar(
+        title: "Hinweis",
+        message: "Es sind entweder keine oder nicht genug Einträge vorhanden.",
+        backgroundColor: Colors.black54,
+        margin: EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: Duration(seconds: 3),
+      )..show(context);
+    }
+  }
+
+  void hideStatistic(String s, int index) {
+    setState(() {
+      switch (activated) {
+        case 0:
+          _yValues1 = new List();
+          break;
+        case 1:
+          _yValues2 = new List();
+          break;
+        case 2:
+          _yValues3 = new List();
+          break;
+        case 3:
+          _yValues4 = new List();
+          break;
+      }
+      _xValues = statHelper.getDaysForAMonth(_visibleMonth.month);
+      _canvasActivated[activated] = false;
+      print(_xValues.length);
+      buttons[index] = buildButton(s, index, Colors.white);
+    });
+  }
+
+  Widget buildStatisticsAnimation(int index, List<dynamic> yWerte) {
+    return Container(
+      //color: Colors.red,
+      height: 320,
+      //margin: EdgeInsets.only(top: 500, bottom: 0),
+      width: MediaQuery.of(context).size.width,
+      child: GestureDetector(
+        onHorizontalDragStart: (DragStartDetails details) =>
+            dragStart(context, details),
+        onHorizontalDragUpdate: (DragUpdateDetails details) =>
+            dragUpdate(context, details),
+        onHorizontalDragDown: (DragDownDetails details) =>
+            dragDown(context, details),
+        child: AnimatedBuilder(
+          animation: this._controller,
+          builder: (BuildContext context, Widget child) {
+            return CustomPaint(
+              painter: CustomStatisticPainter(
+                animation: this._controller,
+                backgroundColor: Colors.white,
+                color: colors[index],
+                posX: this._posx,
+                werteY: yWerte,
+                werteX: this._xValues,
+                active: _canvasActivated[index],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future getInhalationSpraysAsWidget() async {
+    await statHelper.getDatabaseEntries();
+    List<String> data = await statHelper
+        .getAllUsedSpraysWithDayTimeByMonth(_visibleMonth.month);
+
+    for (int i = 0; i < data.length; i++) {
+      print("buttons");
+      buttons.add(buildButton(data[i], buttons.length, Colors.white));
+      if (i + 1 == data.length) {
+        buttons.add(buildButton("Symptome", buttons.length, Colors.white));
+        buttons.add(buildButton("Angst/ Panik", buttons.length, Colors.white));
+        buttons.add(buildButton(
+            "Bedarfsmedikation genommen", buttons.length, Colors.white));
+        buttons
+            .add(buildButton("Bettzeug waschen", buttons.length, Colors.white));
+        buttons.add(buildButton("Krank", buttons.length, Colors.white));
+        buttons.add(buildButton("Putzen", buttons.length, Colors.white));
+        buttons.add(buildButton("Sport", buttons.length, Colors.white));
+
+      }
+    }
+    setState(() {
+      buttonLoaded = true;
+    });
   }
 
   Widget getHeadline(String t) {

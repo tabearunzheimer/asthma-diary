@@ -21,18 +21,20 @@ class Diary{
   List <Inhalation> _spraysNoon;
   List <Inhalation> _spraysEvening;
   List <Inhalation> _spraysNight;
+  List <Inhalation> _spraysDemand;
   int _rating;
   String _others;
   String _symptoms;
   DateTime _date;
   String _notes;
 
-  Diary(int id, String spraysMorning, String spraysNoon, String spraysEvening, String spraysNight, int rating, String others, String symptoms, int day, int month, int year, String notes){
+  Diary(int id, String spraysMorning, String spraysNoon, String spraysEvening, String spraysNight, int rating, String others, String symptoms, int day, int month, int year, String notes, String spraysDemand){
     _id = id;
     _spraysMorning = separateSpraysString(spraysMorning);
     _spraysNoon = separateSpraysString(spraysNoon);
     _spraysEvening = separateSpraysString(spraysEvening);
     _spraysNight = separateSpraysString(spraysNight);
+    _spraysDemand = separateSpraysString(spraysDemand);
     _rating = rating;
     _others = others;
     _symptoms = symptoms;
@@ -50,6 +52,8 @@ class Diary{
       case 2: return _spraysEvening;
       break;
       case 3: return _spraysNight;
+      break;
+      case 4: return _spraysDemand;
       break;
       default: return null;
     }
@@ -189,6 +193,7 @@ class Diary{
       parsedJson['month'],
       parsedJson['year'],
       parsedJson['notes'],
+      parsedJson['spraysDemand'],
     );
     return d;
   }

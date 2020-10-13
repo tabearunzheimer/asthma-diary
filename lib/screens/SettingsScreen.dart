@@ -21,7 +21,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const String userDemandSprays = 'userDemandSprays';
   SharedPreferences prefs;
 
-  Diary _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "");
+  Diary _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "", "");
   List<Inhalation> _morning;
   List<Inhalation> _noon;
   List<Inhalation> _evening;

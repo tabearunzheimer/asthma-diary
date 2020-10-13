@@ -23,6 +23,7 @@ class DiaryDatabaseHelper {
   static final columnMonth = 'month';
   static final columnYear = 'year';
   static final columnNotes = 'notes';
+  static final columnSpraysDemand = 'spraysDemand';
 
   DiaryDatabaseHelper._privateConstructor();
 
@@ -48,7 +49,7 @@ class DiaryDatabaseHelper {
   ///creates the table
   Future _onCreate(Database db, int version) async {
     await db.execute(
-        '''CREATE TABLE $table($columnId INTEGER PRIMARY KEY, $columnSpraysMorning STRING,  $columnSpraysNoon STRING,  $columnSpraysEvening STRING,  $columnSpraysNight STRING, $columnRating INTEGER, $columnOthers STRING, $columnSymptoms STRING, $columnDay INTEGER, $columnMonth INTEGER, $columnYear INTEGER, $columnNotes STRING)''');
+        '''CREATE TABLE $table($columnId INTEGER PRIMARY KEY, $columnSpraysMorning STRING,  $columnSpraysNoon STRING,  $columnSpraysEvening STRING,  $columnSpraysNight STRING, $columnRating INTEGER, $columnOthers STRING, $columnSymptoms STRING, $columnDay INTEGER, $columnMonth INTEGER, $columnYear INTEGER, $columnNotes STRING, $columnSpraysDemand STRING)''');
   }
 
   ///adds a new column

@@ -22,9 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Inhalation> _noon;
   List<Inhalation> _evening;
   List<Inhalation> _night;
+  List<Inhalation> _demand;
+
   TextEditingController _notesController = new TextEditingController();
   String _notes;
   List<bool> _inhalationDone;
+  List<bool> _demandInhalationDone;
+  bool _showDemandInhalation;
   List<String> _symptoms = [
     "Allergische Reaktion",
     "Anstrengung beim Ausatmen",
@@ -54,17 +58,21 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String userNoonSprays = 'userNoonSprays';
   static const String userEveningSprays = 'userEveningSprays';
   static const String userNightSprays = 'userNightSprays';
+  static const String userDemandSprays = 'userDemandSprays';
 
   @override
   void initState() {
     super.initState();
-    _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "");
+    _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "", "");
     _reusableWidgets = new ReusableWidgets(context, _selectedIndex);
     _morning = new List<Inhalation>();
     _noon = new List<Inhalation>();
     _evening = new List<Inhalation>();
     _night = new List<Inhalation>();
+    _demand = new List<Inhalation>();
     _inhalationDone = new List<bool>();
+    _demandInhalationDone = new List();
+    _showDemandInhalation = false;
     _symptomsAndSurroundingsChecked = new List<bool>();
 
     for (int i = 0; i < _symptoms.length + _surroundings.length; i++) {
@@ -80,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
       loadString(userNoonSprays);
       loadString(userEveningSprays);
       loadString(userNightSprays);
+      loadString(userDemandSprays);
     });
     createDayList();
   }
@@ -146,6 +155,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           "Umstände des Tages",
                           _surroundings,
                           _symptoms.length),
+                    ),
+                  ),
+                  Visibility(
+                    visible: _showDemandInhalation,
+                    child: Card(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: buildDemandList(),
+                      ),
                     ),
                   ),
                   Card(
@@ -325,12 +346,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSymptomsAndSurroundingsListItems(int index, List<String> l, int adding) {
+  Widget _buildSymptomsAndSurroundingsListItems(
+      int index, List<String> l, int adding) {
     return ListTile(
       leading: Checkbox(
         value: _symptomsAndSurroundingsChecked[index + adding],
         onChanged: (bool value) {
-          changedEntry(value, index + adding, _symptomsAndSurroundingsChecked, null, 0);
+          if (l[index] == "Bedarfsmedikation genommen") {
+            _showDemandInhalation = value;
+          }
+          changedEntry(
+              value, index + adding, _symptomsAndSurroundingsChecked, null, 0);
         },
       ),
       title: Text(l[index]),
@@ -346,6 +372,45 @@ class _HomeScreenState extends State<HomeScreen> {
       list.add(_buildSymptomsAndSurroundingsListItems(i, l, index));
     }
     return list;
+  }
+
+  List<Widget> buildDemandList() {
+    List<Widget> erg = new List();
+    for (int i = 0; i < _demand.length; i++) {
+      erg.add(_buildDemandListItems(i, _demand));
+    }
+    if (erg.length == 0) {
+      erg.add(
+        Container(
+          padding: EdgeInsets.all(10),
+          color: Color.fromRGBO(0, 0, 200, 1),
+          child: Text(
+            "Bitte füge dein(e) Notfall- oder Bedarfssprays unter den Einstellungen hinzu",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    } else {
+      erg.insert(0,getDivider());
+      erg.insert(0,getHeadline("Genutzte Bedarfsmedikation"));
+    }
+    return erg;
+  }
+
+  Widget _buildDemandListItems(int index, List<Inhalation> list) {
+    _demandInhalationDone.add(false);
+    return ListTile(
+      leading: Checkbox(
+        value: _demandInhalationDone[index],
+        onChanged: (bool value) {
+          list[index].setDone(value);
+          changedEntry(value, index, _demandInhalationDone, list, index);
+        },
+      ),
+      title: Text(
+          list[index].getAmount().toString() + "x " + list[index].getSpray()),
+      subtitle: Text(list[index].getDose().toString() + " ug"),
+    );
   }
 
   ratingButtonPressed(int index) {
@@ -379,24 +444,32 @@ class _HomeScreenState extends State<HomeScreen> {
         _noon = _d.getSpraysList(1);
         _evening = _d.getSpraysList(2);
         _night = _d.getSpraysList(3);
+        _demand = _d.getSpraysList(4);
 
         _inhalationDone = new List();
+        _demandInhalationDone = new List();
+
         for (int i = 0; i < _morning.length; i++) {
           _inhalationDone.add(_morning[i].getDone());
         }
-        ;
+
         for (int i = 0; i < _noon.length; i++) {
           _inhalationDone.add(_noon[i].getDone());
         }
-        ;
+
         for (int i = 0; i < _evening.length; i++) {
           _inhalationDone.add(_evening[i].getDone());
         }
-        ;
+
         for (int i = 0; i < _night.length; i++) {
           _inhalationDone.add(_night[i].getDone());
         }
-        ;
+
+        for (int i = 0; i < _demand.length; i++) {
+          print("demand: " + _demand[i].toString() + " bool: " + _demand[i].getDone().toString());
+          _demandInhalationDone.add(_demand[i].getDone());
+        }
+
         List<String> symp = _d.separateStringByComma(_d.getSymptoms());
         List<String> sur = _d.separateStringByComma(_d.getSurroundings());
 
@@ -408,18 +481,19 @@ class _HomeScreenState extends State<HomeScreen> {
               _symptomsAndSurroundingsChecked[i] = true;
             }
           }
-          //print("symptoms-i: " + i.toString() + " symp: " + symp.length.toString() + " bool: " + _symptomsAndSurroundingsChecked[i].toString());
         }
 
         int offset = _symptomsAndSurroundingsChecked.length == 0 ? 0 : -1;
+        _showDemandInhalation = false;
 
         for (int i = 0; i < _surroundings.length; i++) {
           _symptomsAndSurroundingsChecked.add(false);
           for (int j = 0; j < sur.length; j++) {
-            print("i: " + i.toString() + " j: " + j.toString() + " sur-length: " + _surroundings.length.toString());
             if (sur[j] == _surroundings[i]) {
-              //print("check: " + _symptomsAndSurroundingsChecked.length.toString() + " o: " + (_symptomsAndSurroundingsChecked.length+offset).toString());
-              _symptomsAndSurroundingsChecked[_symptomsAndSurroundingsChecked.length+offset] = true;
+              _symptomsAndSurroundingsChecked[_symptomsAndSurroundingsChecked.length + offset] = true;
+              if (_surroundings[i] == "Bedarfsmedikation genommen"){
+                _showDemandInhalation = true;
+              }
             }
           }
         }
@@ -434,14 +508,21 @@ class _HomeScreenState extends State<HomeScreen> {
         loadString(userNoonSprays);
         loadString(userEveningSprays);
         loadString(userNightSprays);
+        loadString(userDemandSprays);
         _inhalationDone = new List();
+        _demandInhalationDone = new List();
+        _showDemandInhalation = false;
         _symptomsAndSurroundingsChecked = new List();
 
-        for (int i = 0; i < _morning.length + _noon.length + _evening.length + _night.length; i++) {
+        for (int i = 0;
+            i < _morning.length + _noon.length + _evening.length + _night.length; i++) {
           _inhalationDone.add(false);
         }
-        for (int i = 0; i < _symptoms.length + _surroundings.length; i++){
+        for (int i = 0; i < _symptoms.length + _surroundings.length; i++) {
           _symptomsAndSurroundingsChecked.add(false);
+        }
+        for(int i = 0; i < _demand.length; i++){
+          _demandInhalationDone.add(false);
         }
       });
     }
@@ -479,12 +560,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  changedEntry(bool value, int index, List<bool> list, List<Inhalation> inh, int i) {
+  changedEntry(
+      bool value, int index, List<bool> list, List<Inhalation> inh, int i) {
     setState(() {
       showSaveButton();
       //print("value: " + value.toString() + " index: " + index.toString() + " list: " + _symptomsAndSurroundingsChecked[index].toString());
       list[index] = value;
-      if (inh != null){
+      if (inh != null) {
         inh[i].setDone(value);
       }
     });
@@ -514,12 +596,14 @@ class _HomeScreenState extends State<HomeScreen> {
       String e = _d.createSpraysString(_evening);
       String ni = _d.createSpraysString(_night);
       String symp = getSymptomsAndSurroundingsString(0, _symptoms);
-      String sur =
-          getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
+      String sur = getSymptomsAndSurroundingsString(_symptoms.length, _surroundings);
       this._notes = _notesController.text;
+      String demandInh = "";
+      if (_showDemandInhalation){
+        demandInh = _d.createSpraysString(_demand);
+      }
 
-      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day,
-          _visibleDay.month, _visibleDay.year, _notes);
+      _d = new Diary(id, m, no, e, ni, r, symp, sur, _visibleDay.day, _visibleDay.month, _visibleDay.year, _notes, "");
 
       Map<String, dynamic> map = {
         DiaryDatabaseHelper.columnId: id,
@@ -533,7 +617,8 @@ class _HomeScreenState extends State<HomeScreen> {
         DiaryDatabaseHelper.columnSpraysMorning: m,
         DiaryDatabaseHelper.columnSpraysEvening: e,
         DiaryDatabaseHelper.columnSpraysNoon: no,
-        DiaryDatabaseHelper.columnNotes: _notes
+        DiaryDatabaseHelper.columnNotes: _notes,
+        DiaryDatabaseHelper.columnSpraysDemand: demandInh
       };
       try {
         checkForEntryAndSave(map, id);
@@ -559,12 +644,11 @@ class _HomeScreenState extends State<HomeScreen> {
         )..show(context);
       }
     });
-
   }
 
-  void checkForEntryAndSave (Map<String, dynamic> map, int id) async {
+  void checkForEntryAndSave(Map<String, dynamic> map, int id) async {
     List l = await dbHelper.getList(id);
-    if (l.length == 0){
+    if (l.length == 0) {
       dbHelper.insert(map);
     } else {
       dbHelper.update(map);
@@ -596,6 +680,10 @@ class _HomeScreenState extends State<HomeScreen> {
         case 'userNightSprays':
           String s = prefs.get(key) ?? "No Data";
           _night = _d.separateSpraysString(s);
+          break;
+        case 'userDemandSprays':
+          String s = prefs.get(key) ?? "No Data";
+          _demand = _d.separateSpraysString(s);
           break;
       }
     });

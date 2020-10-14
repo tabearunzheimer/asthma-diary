@@ -75,103 +75,103 @@ class _StatisticsScreenState extends State<StatisticsScreen>
       appBar: _reusableWidgets.getNormalAppBar(),
       body: SingleChildScrollView(
           child: Column(
-        children: [
-          Card(
-            shape: new RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
-                  onPressed: () {
-                    setState(() {
-                      _visibleMonth = new DateTime(
-                          _visibleMonth.year, _visibleMonth.month - 1);
-                      getInhalationSpraysAsWidget();
-                      buttons = new List();
-                      buttonLoaded = false;
-                      activatedButtonsOrder = new List();
-                      buttonsActivated = new List();
-                      _yValues1 = new List();
-                      _yValues2 = new List();
-                      _yValues3 = new List();
-                      _yValues4 = new List();
-                      getInhalationSpraysAsWidget();
-                    });
-                  },
+            children: [
+              Card(
+                shape: new RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: () {
+                        setState(() {
+                          _visibleMonth = new DateTime(
+                              _visibleMonth.year, _visibleMonth.month - 1);
+                          getInhalationSpraysAsWidget();
+                          buttons = new List();
+                          buttonLoaded = false;
+                          activatedButtonsOrder = new List();
+                          buttonsActivated = new List();
+                          _yValues1 = new List();
+                          _yValues2 = new List();
+                          _yValues3 = new List();
+                          _yValues4 = new List();
+                          getInhalationSpraysAsWidget();
+                        });
+                      },
+                    ),
+                    Text(new DateHelper().getMonthName(_visibleMonth.month) +
+                        " " +
+                        _visibleMonth.year.toString()),
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: () {
+                        setState(() {
+                          _visibleMonth = new DateTime(_visibleMonth.year, _visibleMonth.month + 1);
+                          buttons = new List();
+                          buttonLoaded = false;
+                          activatedButtonsOrder = new List();
+                          buttonsActivated = new List();
+                          _yValues1 = new List();
+                          _yValues2 = new List();
+                          _yValues3 = new List();
+                          _yValues4 = new List();
+                          getInhalationSpraysAsWidget();
+                        });
+                      },
+                    ),
+                  ],
                 ),
-                Text(new DateHelper().getMonthName(_visibleMonth.month) +
-                    " " +
-                    _visibleMonth.year.toString()),
-                IconButton(
-                  icon: Icon(Icons.arrow_forward_ios),
-                  onPressed: () {
-                    setState(() {
-                      _visibleMonth = new DateTime(_visibleMonth.year, _visibleMonth.month + 1);
-                      buttons = new List();
-                      buttonLoaded = false;
-                      activatedButtonsOrder = new List();
-                      buttonsActivated = new List();
-                      _yValues1 = new List();
-                      _yValues2 = new List();
-                      _yValues3 = new List();
-                      _yValues4 = new List();
-                      getInhalationSpraysAsWidget();
-                    });
-                  },
+              ),
+              Card(
+                shape: new RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                margin: EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    getHeadline("Statistik"),
+                    getDivider(),
+                    Container(
+                      child: Stack(
+                        children: [
+                          buildStatisticsAnimation(0, _yValues1),
+                          buildStatisticsAnimation(1, _yValues2),
+                          buildStatisticsAnimation(2, _yValues3),
+                          buildStatisticsAnimation(3, _yValues4),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      //color: Colors.green,
+                      margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
+                      padding: EdgeInsets.all(5),
+                      child: Wrap(
+                        alignment: WrapAlignment.start,
+                        runSpacing: 10,
+                        spacing: 10,
+                        children: buttonLoaded
+                            ? buttons
+                            : [
+                          Container(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(),
+                          ),
+                          Container(
+                            child: Text("Bitte warte kurz"),
+                            alignment: Alignment.center,
+                            margin: EdgeInsets.only(bottom: 50),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Card(
-            shape: new RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            margin: EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                getHeadline("Statistik"),
-                getDivider(),
-                Container(
-                  child: Stack(
-                    children: [
-                      buildStatisticsAnimation(0, _yValues1),
-                      buildStatisticsAnimation(1, _yValues2),
-                      buildStatisticsAnimation(2, _yValues3),
-                      buildStatisticsAnimation(3, _yValues4),
-                    ],
-                  ),
-                ),
-                Container(
-                  //color: Colors.green,
-                  margin: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                  padding: EdgeInsets.all(5),
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    runSpacing: 10,
-                    spacing: 10,
-                    children: buttonLoaded
-                        ? buttons
-                        : [
-                            Container(
-                              alignment: Alignment.center,
-                              child: CircularProgressIndicator(),
-                            ),
-                            Container(
-                              child: Text("Bitte warte kurz"),
-                              alignment: Alignment.center,
-                              margin: EdgeInsets.only(bottom: 50),
-                            ),
-                          ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      )),
+              ),
+            ],
+          )),
       bottomNavigationBar: _reusableWidgets.getBottomNavigationBar(),
     );
   }

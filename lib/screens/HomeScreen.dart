@@ -398,13 +398,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDemandListItems(int index, List<Inhalation> list) {
-    _demandInhalationDone.add(false);
     return ListTile(
       leading: Checkbox(
         value: _demandInhalationDone[index],
         onChanged: (bool value) {
-          list[index].setDone(value);
-          changedEntry(value, index, _demandInhalationDone, list, index);
+          setState(() {
+            list[index].setDone(value);
+            changedEntry(value, index, _demandInhalationDone, list, index);
+          });
         },
       ),
       title: Text(
@@ -444,10 +445,21 @@ class _HomeScreenState extends State<HomeScreen> {
         _noon = _d.getSpraysList(1);
         _evening = _d.getSpraysList(2);
         _night = _d.getSpraysList(3);
-        _demand = _d.getSpraysList(4);
+
+        _demandInhalationDone = new List();
+        loadString(userDemandSprays);
+        List<Inhalation> zw = _d.getSpraysList(4);
+        print(zw[0].getDone());
+        for (int i = 0; i < zw.length; i++) {
+          if (zw[i].getDone()){
+            _demandInhalationDone.add(true);
+          } else {
+            _demandInhalationDone.add(false);
+          }
+        }
 
         _inhalationDone = new List();
-        _demandInhalationDone = new List();
+
 
         for (int i = 0; i < _morning.length; i++) {
           _inhalationDone.add(_morning[i].getDone());
@@ -465,10 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _inhalationDone.add(_night[i].getDone());
         }
 
-        for (int i = 0; i < _demand.length; i++) {
-          print("demand: " + _demand[i].toString() + " bool: " + _demand[i].getDone().toString());
-          _demandInhalationDone.add(_demand[i].getDone());
-        }
+
 
         List<String> symp = _d.separateStringByComma(_d.getSymptoms());
         List<String> sur = _d.separateStringByComma(_d.getSurroundings());
@@ -666,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
       switch (key) {
         case 'userMorningSprays':
           String s = prefs.get(key) ?? "No Data";
-          if (s == "No Data"){
+          if (s != "No Data"){
             _morning = _d.separateSpraysString(s);
           } else {
            _morning = new List();
@@ -674,7 +683,7 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
         case 'userNoonSprays':
           String s = prefs.get(key) ?? "No Data";
-          if (s == "No Data"){
+          if (s != "No Data"){
             _noon = _d.separateSpraysString(s);
           } else {
             _noon = new List();
@@ -682,7 +691,7 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
         case 'userEveningSprays':
           String s = prefs.get(key) ?? "No Data";
-          if (s == "No Data"){
+          if (s != "No Data"){
             _evening = _d.separateSpraysString(s);
           } else {
             _evening = new List();
@@ -690,7 +699,7 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
         case 'userNightSprays':
           String s = prefs.get(key) ?? "No Data";
-          if (s == "No Data"){
+          if (s != "No Data"){
             _night = _d.separateSpraysString(s);
           } else {
             _night = new List();
@@ -698,7 +707,7 @@ class _HomeScreenState extends State<HomeScreen> {
           break;
         case 'userDemandSprays':
           String s = prefs.get(key) ?? "No Data";
-          if (s == "No Data"){
+          if (s != "No Data"){
             _demand = _d.separateSpraysString(s);
           } else {
             _demand = new List();

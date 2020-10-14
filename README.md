@@ -1,16 +1,21 @@
-# asthma_tagebuch
+# Asthma-Tagebuch
 
-A new Flutter application.
 
-## Getting Started
+## Über
+Die App soll Personen mit Asthma helfen ihre Medikamente und Symptome aufzuzeichnen
 
-This project is a starting point for a Flutter application.
+Man kann seine Medikamente und Symptome über den Tag hinweg eintragen. 
+In der Statistik sieht man ob es Zusammenhänge zwischen Symptomen, Umständen und den Medikamenten gibt.
 
-A few resources to get you started if this is your first Flutter project:
+Geplant: Erinnerungen für Allergiker (Hinweise bei starker Pollendichte oder Hinweis zum putzen bei Hausstaub-Allergie)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# asthma-diary
+
+## About
+The app is designed to help people with asthma record their medications and symptoms. 
+
+You can record your medications and symptoms throughout the day. 
+In the statistics you can see if there are connections between symptoms, circumstances and the medication. 
+
+Planned: Reminders for allergy sufferers (tips for high pollen density and tips for cleaning in case of house dust allergy)

@@ -435,80 +435,72 @@ class _HomeScreenState extends State<HomeScreen> {
         _visibleDay.month.toString() +
         _visibleDay.year.toString();
 
-    try {
-      final row = await dbHelper.getList(int.parse(day));
-      print("current day: " + row.toString());
-      l = row.toList();
-      setState(() {
-        _d = new Diary.fromJson(l[0]);
-        _morning = _d.getSpraysList(0);
-        _noon = _d.getSpraysList(1);
-        _evening = _d.getSpraysList(2);
-        _night = _d.getSpraysList(3);
+     try {
+       final row = await dbHelper.getList(int.parse(day));
+       print("current day: " + row.toString());
+       l = row.toList();
+       setState(() {
+         _d = new Diary.fromJson(l[0]);
+         _morning = _d.getSpraysList(0);
+         _noon = _d.getSpraysList(1);
+         _evening = _d.getSpraysList(2);
+         _night = _d.getSpraysList(3);
+         _demand = _d.getSpraysList(4);
 
-        _demandInhalationDone = new List();
-        loadString(userDemandSprays);
-        List<Inhalation> zw = _d.getSpraysList(4);
-        print(zw[0].getDone());
-        for (int i = 0; i < zw.length; i++) {
-          if (zw[i].getDone()){
-            _demandInhalationDone.add(true);
-          } else {
-            _demandInhalationDone.add(false);
-          }
-        }
+         _inhalationDone = new List();
+         _demandInhalationDone = new List();
 
-        _inhalationDone = new List();
+         for (int i = 0; i < _morning.length; i++) {
+           _inhalationDone.add(_morning[i].getDone());
+         }
 
+         for (int i = 0; i < _noon.length; i++) {
+           _inhalationDone.add(_noon[i].getDone());
+         }
 
-        for (int i = 0; i < _morning.length; i++) {
-          _inhalationDone.add(_morning[i].getDone());
-        }
+         for (int i = 0; i < _evening.length; i++) {
+           _inhalationDone.add(_evening[i].getDone());
+         }
 
-        for (int i = 0; i < _noon.length; i++) {
-          _inhalationDone.add(_noon[i].getDone());
-        }
+         for (int i = 0; i < _night.length; i++) {
+           _inhalationDone.add(_night[i].getDone());
+         }
 
-        for (int i = 0; i < _evening.length; i++) {
-          _inhalationDone.add(_evening[i].getDone());
-        }
+         for (int i = 0; i < _demand.length; i++) {
+           print("demand: " + _demand[i].toString() + " bool: " + _demand[i].getDone().toString());
+           _demandInhalationDone.add(_demand[i].getDone());
+         }
 
-        for (int i = 0; i < _night.length; i++) {
-          _inhalationDone.add(_night[i].getDone());
-        }
+         List<String> symp = _d.separateStringByComma(_d.getSymptoms());
+         List<String> sur = _d.separateStringByComma(_d.getSurroundings());
 
+         _symptomsAndSurroundingsChecked = new List();
+         for (int i = 0; i < _symptoms.length; i++) {
+           _symptomsAndSurroundingsChecked.add(false);
+           for (int j = 0; j < symp.length; j++) {
+             if (symp[j] == _symptoms[i]) {
+               _symptomsAndSurroundingsChecked[i] = true;
+             }
+           }
+         }
 
+         int offset = _symptomsAndSurroundingsChecked.length == 0 ? 0 : -1;
+         _showDemandInhalation = false;
 
-        List<String> symp = _d.separateStringByComma(_d.getSymptoms());
-        List<String> sur = _d.separateStringByComma(_d.getSurroundings());
-
-        _symptomsAndSurroundingsChecked = new List();
-        for (int i = 0; i < _symptoms.length; i++) {
-          _symptomsAndSurroundingsChecked.add(false);
-          for (int j = 0; j < symp.length; j++) {
-            if (symp[j] == _symptoms[i]) {
-              _symptomsAndSurroundingsChecked[i] = true;
-            }
-          }
-        }
-
-        int offset = _symptomsAndSurroundingsChecked.length == 0 ? 0 : -1;
-        _showDemandInhalation = false;
-
-        for (int i = 0; i < _surroundings.length; i++) {
-          _symptomsAndSurroundingsChecked.add(false);
-          for (int j = 0; j < sur.length; j++) {
-            if (sur[j] == _surroundings[i]) {
-              _symptomsAndSurroundingsChecked[_symptomsAndSurroundingsChecked.length + offset] = true;
-              if (_surroundings[i] == "Bedarfsmedikation genommen"){
-                _showDemandInhalation = true;
-              }
-            }
-          }
-        }
-        //print("checked: " + _symptomsAndSurroundingsChecked.length.toString() + " sym+sur: " + (_symptoms.length + _surroundings.length).toString());
-        this._notesController.text = _d.getNotes();
-      });
+         for (int i = 0; i < _surroundings.length; i++) {
+           _symptomsAndSurroundingsChecked.add(false);
+           for (int j = 0; j < sur.length; j++) {
+             if (sur[j] == _surroundings[i]) {
+               _symptomsAndSurroundingsChecked[_symptomsAndSurroundingsChecked.length + offset] = true;
+               if (_surroundings[i] == "Bedarfsmedikation genommen"){
+                 _showDemandInhalation = true;
+               }
+             }
+           }
+         }
+         //print("checked: " + _symptomsAndSurroundingsChecked.length.toString() + " sym+sur: " + (_symptoms.length + _surroundings.length).toString());
+         this._notesController.text = _d.getNotes();
+       });
     } catch (ex) {
       print("Datenbank-Fehler: " + ex.toString());
 

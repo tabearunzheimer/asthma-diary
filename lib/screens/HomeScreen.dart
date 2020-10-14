@@ -666,24 +666,43 @@ class _HomeScreenState extends State<HomeScreen> {
       switch (key) {
         case 'userMorningSprays':
           String s = prefs.get(key) ?? "No Data";
-          print("Morning: " + s);
-          _morning = _d.separateSpraysString(s);
+          if (s == "No Data"){
+            _morning = _d.separateSpraysString(s);
+          } else {
+           _morning = new List();
+          }
           break;
         case 'userNoonSprays':
           String s = prefs.get(key) ?? "No Data";
-          _noon = _d.separateSpraysString(s);
+          if (s == "No Data"){
+            _noon = _d.separateSpraysString(s);
+          } else {
+            _noon = new List();
+          }
           break;
         case 'userEveningSprays':
           String s = prefs.get(key) ?? "No Data";
-          _evening = _d.separateSpraysString(s);
+          if (s == "No Data"){
+            _evening = _d.separateSpraysString(s);
+          } else {
+            _evening = new List();
+          }
           break;
         case 'userNightSprays':
           String s = prefs.get(key) ?? "No Data";
-          _night = _d.separateSpraysString(s);
+          if (s == "No Data"){
+            _night = _d.separateSpraysString(s);
+          } else {
+            _night = new List();
+          }
           break;
         case 'userDemandSprays':
           String s = prefs.get(key) ?? "No Data";
-          _demand = _d.separateSpraysString(s);
+          if (s == "No Data"){
+            _demand = _d.separateSpraysString(s);
+          } else {
+            _demand = new List();
+          }
           break;
       }
     });

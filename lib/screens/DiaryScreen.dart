@@ -20,6 +20,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
   final dbHelper = DiaryDatabaseHelper.instance;
   List<Diary> _diaryList;
   DateTime _currentDate;
+  DateTime _currentMonth;
   EventList<Event> _entryDays;
 
   @override
@@ -27,6 +28,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
     super.initState();
     _reusableWidgets = new ReusableWidgets(context, _selectedIndex);
     _currentDate = DateTime.now();
+    _currentMonth = DateTime.now();
     _diaryList = new List();
     _entryDays = new EventList();
     getDatabaseEntries();
@@ -80,7 +82,7 @@ class _DiaryScreenState extends State<DiaryScreen> {
         weekendTextStyle: TextStyle(
           color: Color.fromRGBO(0, 0, 200, 1),
         ),
-        selectedDateTime: this._currentDate,
+        selectedDateTime: this._currentMonth,
         weekdayTextStyle: TextStyle(color: Color.fromRGBO(0, 0, 200, 1)),
         onDayPressed: (DateTime date, List<Event> events) {
           this.setState(() => this._currentDate = date);
@@ -92,18 +94,6 @@ class _DiaryScreenState extends State<DiaryScreen> {
           width: 4.0,
           margin: EdgeInsets.only(right: 1),
         ),
-        onLeftArrowPressed: () {
-          setState(() {
-            _currentDate =
-                new DateTime(_currentDate.year, _currentDate.month - 1);
-          });
-        },
-        onRightArrowPressed: () {
-          setState(() {
-            _currentDate =
-                new DateTime(_currentDate.year, _currentDate.month + 1);
-          });
-        },
       ),
     );
   }

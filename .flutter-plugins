@@ -1,8 +1,12 @@
 # This is a generated file; do not edit or check into version control.
+downloads_path_provider=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\downloads_path_provider-0.1.0\\
+file_picker=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\file_picker-2.0.7\\
+flutter_plugin_android_lifecycle=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\flutter_plugin_android_lifecycle-1.0.11\\
 path_provider=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider-1.6.18\\
 path_provider_linux=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_linux-0.0.1+2\\
 path_provider_macos=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_macos-0.0.4+4\\
 path_provider_windows=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider_windows-0.0.4+1\\
+permission_handler=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\permission_handler-5.0.1+1\\
 shared_preferences=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences-0.5.12\\
 shared_preferences_linux=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences_linux-0.0.2+2\\
 shared_preferences_macos=D:\\Programming\\Flutter\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences_macos-0.0.1+10\\

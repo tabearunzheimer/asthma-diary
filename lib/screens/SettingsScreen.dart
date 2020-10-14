@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:asthma_tagebuch/helper/Diary.dart';
 import 'package:asthma_tagebuch/helper/Inhalation.dart';
 import 'package:asthma_tagebuch/helper/Reusable_Widgets.dart';
+import 'package:asthma_tagebuch/helper/diary_database_helper.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -28,6 +33,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<Inhalation> _evening;
   List<Inhalation> _night;
   List<Inhalation> _demand;
+
+  final dbHelper = DiaryDatabaseHelper.instance;
 
   TextEditingController _sprayName = new TextEditingController();
   TextEditingController _sprayAmount = new TextEditingController();
@@ -59,11 +66,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       loadString(userEveningSprays);
       loadString(userNightSprays);
       loadString(userDemandSprays);
-      for (int i  = 0; i < _allergies.length; i++){
+      for (int i = 0; i < _allergies.length; i++) {
         loadBool(_allergies[i], i);
       }
-      for (int i  = 0; i < _others.length; i++){
-        loadBool(_others[i], _allergies.length+i);
+      for (int i = 0; i < _others.length; i++) {
+        loadBool(_others[i], _allergies.length + i);
       }
     });
   }
@@ -229,7 +236,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     padding: EdgeInsets.all(10),
-                    child: Text("Export der Statistik"),
+                    child: FlatButton(
+                      child: Text("Export der Einträge als Textdokument"),
+                      onPressed: export,
+                    ),
+                  ),
+                ),
+                Card(
+                  //color: Colors.red,
+                  shape: new RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0)),
+                  margin: EdgeInsets.all(10),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.all(10),
+                    child: FlatButton(
+                      child: Text("Import der Einträge mit Textdokument"),
+                      onPressed: import,
+                    ),
                   ),
                 ),
               ],
@@ -482,10 +506,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   //setString(userNameKey, _nametext.text);
                   setState(() {
                     //value = value.replaceAll(new RegExp(r"\s+"), "");
-                    if (_sprayName.text.contains(new RegExp(r"[0-9\,\;]+"))){
+                    if (_sprayName.text.contains(new RegExp(r"[0-9\,\;]+"))) {
                       Flushbar(
                         title: "Hinweis",
-                        message: "In dem Namen des Sprays dürfen keine Sonderzeichen angegeben werden.",
+                        message:
+                            "In dem Namen des Sprays dürfen keine Sonderzeichen angegeben werden.",
                         backgroundColor: Colors.black54,
                         margin: EdgeInsets.all(10),
                         borderRadius: 10,
@@ -502,7 +527,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Navigator.pop(context);
                     }
                   });
-
                 },
               ),
             ],
@@ -512,7 +536,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void deleteInput(){
+  void deleteInput() {
     _sprayName.text = "";
     _sprayDose.text = "";
     _sprayAmount.text = "";
@@ -537,5 +561,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
         break;
     }
     return "";
+  }
+
+  void export() async {
+    if (await Permission.storage.request().isGranted) {
+      await dbHelper.writeDatabaseAsTxt();
+      Flushbar(
+        title: "Hinweis",
+        message: "Daten erfolgreich exportiert. Sie finden die Datei in Ihren Downloads unter dem Namen \"asthma_diary_database.txt\"",
+        backgroundColor: Colors.black54,
+        margin: EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: Duration(seconds: 3),
+      )..show(context);
+    } else {
+      Flushbar(
+        title: "Hinweis",
+        message: "Um die Einträge zu exportieren müssen sie die Berechtigung erteilen.",
+        backgroundColor: Colors.black54,
+        margin: EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: Duration(seconds: 3),
+      )..show(context);
+    }
+
+  }
+
+  void import() async {
+    if (await Permission.storage.request().isGranted) {
+      FilePickerResult result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['txt'],
+      );
+
+      if(result != null) {
+        File file = File(result.files.single.path);
+        int i = await dbHelper.readTxtInDatabase(file);
+        if (i == 0){
+          Flushbar(
+            title: "Hinweis",
+            message: "Daten erfolgreich importiert.",
+            backgroundColor: Colors.black54,
+            margin: EdgeInsets.all(10),
+            borderRadius: 10,
+            duration: Duration(seconds: 3),
+          )..show(context);
+        } else {
+          Flushbar(
+            title: "Hinweis",
+            message: "Fehler beim importieren der Daten.",
+            backgroundColor: Colors.black54,
+            margin: EdgeInsets.all(10),
+            borderRadius: 10,
+            duration: Duration(seconds: 3),
+          )..show(context);
+        }
+      } else {
+        Flushbar(
+          title: "Hinweis",
+          message: "Fehler beim importieren der Daten.",
+          backgroundColor: Colors.black54,
+          margin: EdgeInsets.all(10),
+          borderRadius: 10,
+          duration: Duration(seconds: 3),
+        )..show(context);
+      }
+    } else {
+      Flushbar(
+        title: "Hinweis",
+        message: "Um die Einträge zu importieren müssen sie die Berechtigung erteilen.",
+        backgroundColor: Colors.black54,
+        margin: EdgeInsets.all(10),
+        borderRadius: 10,
+        duration: Duration(seconds: 3),
+      )..show(context);
+    }
+
   }
 }

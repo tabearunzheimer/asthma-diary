@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -59,18 +61,6 @@ class DiaryDatabaseHelper {
     return await db.insert(table, row);
   }
 
-  ///adds a list of values
-  Future<int> insertList() async {
-    Database db = await instance.database;
-    List<Map> list = initEntries();
-    for (int i = 0; i < list.length; i++) {
-      print('Insert $i');
-      Map<String, dynamic> row = list[i];
-      await db.insert(table, row);
-    }
-    return Future.value(0);
-  }
-
   ///returns the column which fits to the id as a map
   Future<List> getList(int id) async {
     Database db = await instance.database;
@@ -109,40 +99,49 @@ class DiaryDatabaseHelper {
   ///deletes the whole database
   Future<int> deleteAll() async {
     Database db = await instance.database;
-    db.delete(table);
+    return db.delete(table);
   }
 
-  List<Map<String, dynamic>> initEntries() {
-    List<Map<String, dynamic>> list = [
-      {
-        DiaryDatabaseHelper.columnId: 11102020,
-        DiaryDatabaseHelper.columnDay: 11,
-        DiaryDatabaseHelper.columnMonth: 10,
-        DiaryDatabaseHelper.columnYear: 2020,
-        DiaryDatabaseHelper.columnSymptoms: "",
-        DiaryDatabaseHelper.columnOthers: "",
-        DiaryDatabaseHelper.columnRating: 0,
-        DiaryDatabaseHelper.columnSpraysNight: "",
-        DiaryDatabaseHelper.columnSpraysMorning: "1,Flutiform,0,1",
-        DiaryDatabaseHelper.columnSpraysEvening: "2,Flutiform,0,0",
-        DiaryDatabaseHelper.columnSpraysNoon: "",
-        DiaryDatabaseHelper.columnNotes: ""
-      },
-      {
-        DiaryDatabaseHelper.columnId: 12102020,
-        DiaryDatabaseHelper.columnDay: 12,
-        DiaryDatabaseHelper.columnMonth: 10,
-        DiaryDatabaseHelper.columnYear: 2020,
-        DiaryDatabaseHelper.columnSymptoms: "",
-        DiaryDatabaseHelper.columnOthers: "",
-        DiaryDatabaseHelper.columnRating: 0,
-        DiaryDatabaseHelper.columnSpraysNight: "",
-        DiaryDatabaseHelper.columnSpraysMorning: "3,Flutiform,0,0",
-        DiaryDatabaseHelper.columnSpraysEvening: "4,Flutiform,0,1",
-        DiaryDatabaseHelper.columnSpraysNoon: "",
-        DiaryDatabaseHelper.columnNotes: ""
-      }
-    ];
-    return list;
+  Future<Directory> get _downloadsDirectory async {
+    Future<Directory> downloadsDirectory = DownloadsPathProvider.downloadsDirectory;
+    return downloadsDirectory;
   }
+
+  Future<File> get _localFile async {
+    Directory path = await _downloadsDirectory;
+    String s = path.path + '/asthma_diary_database.txt';
+    print(s);
+    return File(s);
+  }
+
+  Future<File> writeDatabaseAsTxt() async {
+    final file = await _localFile;
+    List<Map<String, dynamic>> m  = await queryAllRows();
+    String s = "";
+    for (int i = 0; i < m.length; i++){
+      print(m[i].toString());
+        s += json.encode(m[i]) + "\n";
+    }
+    print("s: $s");
+    return file.writeAsString(s);
+  }
+
+  Future<int> readTxtInDatabase(File s) async {
+    try {
+      String contents = await s.readAsString();
+
+      List<String> list = contents.split("\n");
+      list.removeAt(list.length-1);
+
+      for(int i = 0; i < list.length; i++){
+        Map row = json.decode(list[i]);
+        insert(row);
+      }
+      return 0;
+    } catch (e) {
+      print("Fehler beim lesen der txt: " + e);
+      return 1;
+    }
+  }
+
 }

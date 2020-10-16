@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Inhalation> _night;
   List<Inhalation> _demand;
 
-  TextEditingController _notesController = new TextEditingController();
+  TextEditingController _notesController;
   String _notes;
   List<bool> _inhalationDone;
   List<bool> _demandInhalationDone;
@@ -70,6 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _evening = new List<Inhalation>();
     _night = new List<Inhalation>();
     _demand = new List<Inhalation>();
+
+    _notesController = new TextEditingController();
+    _notes = "";
+
     _inhalationDone = new List<bool>();
     _demandInhalationDone = new List();
     _showDemandInhalation = false;
@@ -445,10 +449,20 @@ class _HomeScreenState extends State<HomeScreen> {
          _noon = _d.getSpraysList(1);
          _evening = _d.getSpraysList(2);
          _night = _d.getSpraysList(3);
-         _demand = _d.getSpraysList(4);
+         List<Inhalation> zw = _d.getSpraysList(4);
 
-         _inhalationDone = new List();
          _demandInhalationDone = new List();
+         _inhalationDone = new List();
+
+         loadString(userDemandSprays);
+
+         for (int i = 0; i < zw.length; i++) {
+           if (zw[i].getDone()){
+             _demandInhalationDone.add(true);
+           } else {
+             _demandInhalationDone.add(false);
+           }
+         }
 
          for (int i = 0; i < _morning.length; i++) {
            _inhalationDone.add(_morning[i].getDone());

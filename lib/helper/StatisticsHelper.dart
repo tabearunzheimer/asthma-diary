@@ -144,32 +144,15 @@ class StatisticsHelper {
       if (_allEntries[i].getMonth() == month) {
         List<Inhalation> l = _allEntries[i].getSpraysList(0); //morgens
         for (int j = 0; j < l.length; j++) {
-          String s = "";
-          if (j == 0) {
-            s = ("Morgens: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
-          } else {
-            for (int k = 0; k < erg.length; k++) {
-              if (("Morgens: " +
-                      l[j].getAmount().toString() +
-                      "x " +
-                      l[j].getSpray() +
-                      " (" +
-                      l[j].getDose().toString() +
-                      ")") !=
-                  erg[k]) {
-                s = ("Morgens: " +
-                    l[j].getAmount().toString() +
-                    "x " +
-                    l[j].getSpray() +
-                    " (" +
-                    l[j].getDose().toString() +
-                    ")");
+            bool found = false;
+            for (int k = 0; k < erg.length && !found; k++) {
+              if (("Morgens: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")") == erg[k]) {
+                found = true;
               }
             }
-          }
-          if (s != "") {
-            erg.add(s);
-          }
+            if (!found) {
+              erg.add("Morgens: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
+            }
         }
       }
     }
@@ -177,37 +160,14 @@ class StatisticsHelper {
       if (_allEntries[i].getMonth() == month) {
         List<Inhalation> l = _allEntries[i].getSpraysList(1); //Mittags
         for (int j = 0; j < l.length; j++) {
-          String s = "";
-          if (j == 0) {
-            s = ("Mittags: " +
-                l[j].getAmount().toString() +
-                "x " +
-                l[j].getSpray() +
-                " (" +
-                l[j].getDose().toString() +
-                ")");
-          } else {
-            for (int k = 0; k < erg.length; k++) {
-              if (("Mittags: " +
-                      l[j].getAmount().toString() +
-                      "x " +
-                      l[j].getSpray() +
-                      " (" +
-                      l[j].getDose().toString() +
-                      ")") !=
-                  erg[k]) {
-                s = ("Mittags: " +
-                    l[j].getAmount().toString() +
-                    "x " +
-                    l[j].getSpray() +
-                    " (" +
-                    l[j].getDose().toString() +
-                    ")");
-              }
+          bool found = false;
+          for (int k = 0; k < erg.length && !found; k++) {
+            if (("Mittags: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")") == erg[k]) {
+              found = true;
             }
           }
-          if (s != "") {
-            erg.add(s);
+          if (!found) {
+            erg.add("Mittags: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
           }
         }
       }
@@ -216,76 +176,35 @@ class StatisticsHelper {
       if (_allEntries[i].getMonth() == month) {
         List<Inhalation> l = _allEntries[i].getSpraysList(2); //Abends
         for (int j = 0; j < l.length; j++) {
-          String s = "";
-          if (j == 0) {
-            s = ("Abends: " +
-                l[j].getAmount().toString() +
-                "x " +
-                l[j].getSpray() +
-                " (" +
-                l[j].getDose().toString() +
-                ")");
-          } else {
-            for (int k = 0; k < erg.length; k++) {
-              if (("Abends: " +
-                      l[j].getAmount().toString() +
-                      "x " +
-                      l[j].getSpray() +
-                      " (" +
-                      l[j].getDose().toString() +
-                      ")") !=
-                  erg[k]) {
-                s = ("Abends: " +
-                    l[j].getAmount().toString() +
-                    "x " +
-                    l[j].getSpray() +
-                    " (" +
-                    l[j].getDose().toString() +
-                    ")");
-              }
+          bool found = false;
+          for (int k = 0; k < erg.length && !found; k++) {
+            if (("Abends: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")") == erg[k]) {
+              found = true;
+
             }
           }
-          if (s != "") {
-            erg.add(s);
+          if (!found) {
+            erg.add("Abends: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
+            print("k ${erg[erg.length-1]}\n");
           }
         }
       }
+    }
+    for (int i = 0; i < erg.length; i++){
+      print("erg: ${erg[i]}");
     }
     for (int i = 0; i < _allEntries.length; i++) {
       if (_allEntries[i].getMonth() == month) {
         List<Inhalation> l = _allEntries[i].getSpraysList(3); //nachts
         for (int j = 0; j < l.length; j++) {
-          String s = "";
-          if (j == 0) {
-            s = ("Nachts: " +
-                l[j].getAmount().toString() +
-                "x " +
-                l[j].getSpray() +
-                " (" +
-                l[j].getDose().toString() +
-                ")");
-          } else {
-            for (int k = 0; k < erg.length; k++) {
-              if (("Nachts: " +
-                      l[j].getAmount().toString() +
-                      "x " +
-                      l[j].getSpray() +
-                      " (" +
-                      l[j].getDose().toString() +
-                      ")") !=
-                  erg[k]) {
-                s = ("Nachts: " +
-                    l[j].getAmount().toString() +
-                    "x " +
-                    l[j].getSpray() +
-                    " (" +
-                    l[j].getDose().toString() +
-                    ")");
-              }
+          bool found = false;
+          for (int k = 0; k < erg.length && !found; k++) {
+            if (("Nachts: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")") == erg[k]) {
+              found = true;
             }
           }
-          if (s != "") {
-            erg.add(s);
+          if (!found) {
+            erg.add("Nachts: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
           }
         }
       }
@@ -294,31 +213,14 @@ class StatisticsHelper {
       if (_allEntries[i].getMonth() == month) {
         List<Inhalation> l = _allEntries[i].getSpraysList(4); //morgens
         for (int j = 0; j < l.length; j++) {
-          String s = "";
-          if (j == 0) {
-            s = ("Bedarf: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
-          } else {
-            for (int k = 0; k < erg.length; k++) {
-              if (("Bedarf: " +
-                  l[j].getAmount().toString() +
-                  "x " +
-                  l[j].getSpray() +
-                  " (" +
-                  l[j].getDose().toString() +
-                  ")") !=
-                  erg[k]) {
-                s = ("Bedarf: " +
-                    l[j].getAmount().toString() +
-                    "x " +
-                    l[j].getSpray() +
-                    " (" +
-                    l[j].getDose().toString() +
-                    ")");
-              }
+          bool found = false;
+          for (int k = 0; k < erg.length && !found; k++) {
+            if (("Bedarf: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")") == erg[k]) {
+              found = true;
             }
           }
-          if (s != "") {
-            erg.add(s);
+          if (!found) {
+            erg.add("Bedarf: " + l[j].getAmount().toString() + "x " + l[j].getSpray() + " (" + l[j].getDose().toString() + ")");
           }
         }
       }
@@ -326,7 +228,7 @@ class StatisticsHelper {
 
     for(int i = 0; i < erg.length; i++){
       for (int j = 0; j < erg.length; j++){
-        if (erg[i] == erg[j] && i != j){
+        if (erg[i].replaceAll(new RegExp(r"\s+"), "") == erg[j].replaceAll(new RegExp(r"\s+"), "") && i != j){
           erg.removeAt(j);
         }
       }

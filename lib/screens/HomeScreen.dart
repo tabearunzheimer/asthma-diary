@@ -60,9 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String userNightSprays = 'userNightSprays';
   static const String userDemandSprays = 'userDemandSprays';
 
+  bool _ready;
+
   @override
   void initState() {
     super.initState();
+    _ready = false;
     _d = new Diary(0, "", "", "", "", 0, "", "", 0, 0, 0, "", "");
     _reusableWidgets = new ReusableWidgets(context, _selectedIndex);
     _morning = new List<Inhalation>();
@@ -102,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _reusableWidgets.getNormalAppBar(),
-      body: Stack(
+      body: _ready ? Stack(
         children: [
           SingleChildScrollView(
             child: Container(
@@ -261,6 +264,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ) : Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        alignment: Alignment.center,
+        child: CircularProgressIndicator(),
       ),
       bottomNavigationBar: _reusableWidgets.getBottomNavigationBar(),
     );
@@ -509,6 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
          }
          //print("checked: " + _symptomsAndSurroundingsChecked.length.toString() + " sym+sur: " + (_symptoms.length + _surroundings.length).toString());
          this._notesController.text = _d.getNotes();
+         _ready = true;
        });
     } catch (ex) {
       print("Datenbank-Fehler: " + ex.toString());
@@ -535,6 +544,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _demandInhalationDone.add(false);
         }
       });
+      _ready = true;
     }
   }
 

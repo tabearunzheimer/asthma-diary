@@ -28,7 +28,7 @@ dependencies:
   shared_preferences: any
   flushbar: any
   flutter_launcher_icons: any
-  flutter_calendar_carousel: any
+  flutter_calendar_carousel: ^1.5.1
   downloads_path_provider: any
   permission_handler: any
   file_picker: any

@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _evening = new List<Inhalation>();
     _night = new List<Inhalation>();
     _demand = new List<Inhalation>();
-
+    _visibleDay = new DateTime.now();
     _notesController = new TextEditingController();
     _notes = "";
 
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _symptomsAndSurroundingsChecked.add(false);
     }
 
-    _visibleDay = new DateTime.now();
+
     _saveButtonOp = false;
     //dbHelper.insertList();
     SharedPreferences.getInstance().then((sp) {
@@ -94,6 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
       loadString(userNightSprays);
       loadString(userDemandSprays);
     });
+
     createDayList();
   }
 
@@ -155,10 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: buildSymptomsAndSurroundingsList(
-                          "Umstände des Tages",
-                          _surroundings,
-                          _symptoms.length),
+                      children: buildSymptomsAndSurroundingsList("Umstände des Tages", _surroundings, _symptoms.length),
                     ),
                   ),
                   Visibility(
@@ -435,10 +433,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void createDayList() async {
     List l;
     print("Create Inhalation List");
-    String day = _visibleDay.day.toString() +
-        _visibleDay.month.toString() +
-        _visibleDay.year.toString();
-
+    String day = _visibleDay.day.toString() + _visibleDay.month.toString() + _visibleDay.year.toString();
      try {
        final row = await dbHelper.getList(int.parse(day));
        print("current day: " + row.toString());
@@ -481,7 +476,7 @@ class _HomeScreenState extends State<HomeScreen> {
          }
 
          for (int i = 0; i < _demand.length; i++) {
-           print("demand: " + _demand[i].toString() + " bool: " + _demand[i].getDone().toString());
+           //print("demand: " + _demand[i].toString() + " bool: " + _demand[i].getDone().toString());
            _demandInhalationDone.add(_demand[i].getDone());
          }
 

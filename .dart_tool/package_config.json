@@ -111,7 +111,7 @@
     },
     {
       "name": "flutter_calendar_carousel",
-      "rootUri": "file:///D:/Programming/Flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_calendar_carousel-1.5.0",
+      "rootUri": "file:///D:/Programming/Flutter/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_calendar_carousel-1.5.1",
       "packageUri": "lib/",
       "languageVersion": "2.0"
     },
@@ -374,7 +374,7 @@
       "languageVersion": "2.7"
     }
   ],
-  "generated": "2020-10-14T20:47:08.889205Z",
+  "generated": "2020-10-16T12:36:35.417283Z",
   "generator": "pub",
   "generatorVersion": "2.10.0"
 }
